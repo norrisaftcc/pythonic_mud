@@ -1,0 +1,4 @@
+
+evennia setup
+admin user: admin
+pw: sudosudo
