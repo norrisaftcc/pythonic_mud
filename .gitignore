@@ -1,7 +1,13 @@
 
 *.pyc
 /evenv
+/evenv_new
 
 **/.claude/settings.local.json
 docs/.DS_Store
-/evenv_new
+
+# Evennia auto-generated files
+mygame/server/.static/admin/
+mygame/server/.static/rest_framework/
+mygame/server/.static/webclient/
+mygame/server/.static/website/
