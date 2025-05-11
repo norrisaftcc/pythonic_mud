@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pythonic MUD - Building Text-Based Worlds with Python</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --background-color: #f5f5f5;
+            --card-color: #fff;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar h2 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 8px 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar ul li a:hover,
+        .sidebar ul li a.active {
+            background-color: var(--accent-color);
+        }
+        
+        .content {
+            flex: 1;
+            padding: 20px;
+            margin-left: 250px;
+            max-width: 800px;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        h1, h2, h3 {
+            color: var(--primary-color);
+        }
+        
+        .card {
+            background-color: var(--card-color);
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        code {
+            background-color: #f0f0f0;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        pre {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .svg-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-item {
+            background-color: var(--card-color);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .feature-item svg {
+            margin-bottom: 10px;
+            max-width: 80px;
+            height: auto;
+        }
+        
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Pythonic MUD</h2>
+            <ul>
+                <li><a href="#" class="nav-link active" data-page="intro">Introduction</a></li>
+                <li><a href="#" class="nav-link" data-page="why-mud">Why Build a MUD?</a></li>
+                <li><a href="#" class="nav-link" data-page="evennia">Meet Evennia</a></li>
+                <li><a href="#" class="nav-link" data-page="getting-started">Getting Started</a></li>
+                <li><a href="#" class="nav-link" data-page="architecture">Architecture</a></li>
+                <li><a href="#" class="nav-link" data-page="game-areas">Game Areas</a></li>
+                <li><a href="#" class="nav-link" data-page="commands">Basic Commands</a></li>
+                <li><a href="#" class="nav-link" data-page="next-steps">Next Steps</a></li>
+            </ul>
+        </div>
+        
+        <div class="content">
+            <!-- Introduction Page -->
+            <div id="intro" class="page active">
+                <div class="card">
+                    <h1>Building Text Worlds with Python</h1>
+                    <p>Welcome to the exciting world of MUD (Multi-User Dungeon) development! In this presentation, we'll explore how to create interactive, text-based multiplayer games using Python and the Evennia framework.</p>
+                    
+                    <div class="svg-container">
+                        <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="40" y="40" width="120" height="120" fill="none" stroke="#2c3e50" stroke-width="2"/>
+                            <circle cx="100" cy="100" r="40" fill="none" stroke="#3498db" stroke-width="2"/>
+                            <path d="M70 70 L130 130 M70 130 L130 70" stroke="#2c3e50" stroke-width="2"/>
+                            <text x="62" y="105" font-family="monospace" font-size="16">P Y T H O N</text>
+                        </svg>
+                    </div>
+                    
+                    <p>By the end of this presentation, you'll understand:</p>
+                    <ul>
+                        <li>What MUDs are and why they're a great learning project</li>
+                        <li>How to set up Evennia, a Python MUD development framework</li>
+                        <li>The basic architecture of an Evennia game</li>
+                        <li>How to create your first game elements</li>
+                        <li>Where to go next on your MUD development journey</li>
+                    </ul>
+                    
+                    <p>Let's dive into the world of text-based adventures!</p>
+                </div>
+            </div>
+            
+            <!-- Why Build a MUD Page -->
+            <div id="why-mud" class="page">
+                <div class="card">
+                    <h1>Why Build a MUD?</h1>
+                    <p>Multi-User Dungeons (MUDs) are text-based multiplayer games that combine storytelling, roleplaying, and game mechanics in a shared virtual world.</p>
+                    
+                    <div class="svg-container">
+                        <svg width="250" height="200" viewBox="0 0 250 200" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="20" y="40" width="210" height="120" rx="5" fill="none" stroke="#2c3e50" stroke-width="2"/>
+                            <text x="40" y="70" font-family="monospace" font-size="10">You enter a dimly lit room.</text>
+                            <text x="40" y="90" font-family="monospace" font-size="10">A mysterious figure stands</text>
+                            <text x="40" y="110" font-family="monospace" font-size="10">in the corner...</text>
+                            <text x="40" y="140" font-family="monospace" font-size="10">> _</text>
+                            <path d="M30 158 C60 180, 190 180, 220 158" fill="none" stroke="#2c3e50" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    
+                    <h3>Educational Benefits</h3>
+                    <ul>
+                        <li><strong>Practical Python Experience:</strong> Apply your Python skills to a real project</li>
+                        <li><strong>Full-Stack Development:</strong> Work with databases, networking, and web interfaces</li>
+                        <li><strong>Object-Oriented Programming:</strong> Use classes to model a virtual world</li>
+                        <li><strong>Collaborative Coding:</strong> Work in teams on different game components</li>
+                        <li><strong>Creative Expression:</strong> Combine coding with storytelling and world-building</li>
+                    </ul>
+                    
+                    <h3>Why MUDs are Perfect for Learning</h3>
+                    <ul>
+                        <li>Text-based interface means focusing on logic, not graphics</li>
+                        <li>Modular design allows incremental development</li>
+                        <li>Immediate feedback as you test your creations</li>
+                        <li>Scale from simple to complex at your own pace</li>
+                        <li>Learn concepts applicable to modern game and web development</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Meet Evennia Page -->
+            <div id="evennia" class="page">
+                <div class="card">
+                    <h1>Meet Evennia</h1>
+                    <p>Evennia is a modern Python framework specifically designed for creating text-based multiplayer games. It provides a complete foundation for MUD development.</p>
+                    
+                    <div class="svg-container">
+                        <svg width="250" height="200" viewBox="0 0 250 200" xmlns="http://www.w3.org/2000/svg">
+                            <polygon points="125,20 230,70 230,130 125,180 20,130 20,70" fill="none" stroke="#2c3e50" stroke-width="2"/>
+                            <text x="82" y="105" font-family="monospace" font-size="16">EVENNIA</text>
+                            <path d="M125 20 L125 180" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,5"/>
+                            <path d="M20 70 L230 130" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,5"/>
+                            <path d="M20 130 L230 70" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,5"/>
+                        </svg>
+                    </div>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-item">
+                            <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="5" y="5" width="40" height="40" rx="5" fill="none" stroke="#3498db" stroke-width="2"/>
+                                <line x1="5" y1="15" x2="45" y2="15" stroke="#3498db" stroke-width="2"/>
+                                <circle cx="10" cy="10" r="2" fill="#3498db"/>
+                                <circle cx="17" cy="10" r="2" fill="#3498db"/>
+                                <circle cx="24" cy="10" r="2" fill="#3498db"/>
+                            </svg>
+                            <h3>Web Client</h3>
+                            <p>Built-in browser interface</p>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="25" cy="25" r="20" fill="none" stroke="#3498db" stroke-width="2"/>
+                                <path d="M15 25 C20 15, 30 15, 35 25 C30 35, 20 35, 15 25" fill="none" stroke="#3498db" stroke-width="2"/>
+                                <circle cx="25" cy="25" r="5" fill="none" stroke="#3498db" stroke-width="2"/>
+                            </svg>
+                            <h3>Real-time</h3>
+                            <p>WebSockets for immediate updates</p>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="10" y="5" width="30" height="40" rx="2" fill="none" stroke="#3498db" stroke-width="2"/>
+                                <line x1="15" y1="15" x2="35" y2="15" stroke="#3498db" stroke-width="2"/>
+                                <line x1="15" y1="25" x2="35" y2="25" stroke="#3498db" stroke-width="2"/>
+                                <line x1="15" y1="35" x2="35" y2="35" stroke="#3498db" stroke-width="2"/>
+                            </svg>
+                            <h3>Database</h3>
+                            <p>Persistent game state</p>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="5" y="5" width="40" height="40" fill="none" stroke="#3498db" stroke-width="2"/>
+                                <rect x="10" y="10" width="30" height="30" fill="none" stroke="#3498db" stroke-width="2"/>
+                                <rect x="15" y="15" width="20" height="20" fill="none" stroke="#3498db" stroke-width="2"/>
+                                <rect x="20" y="20" width="10" height="10" fill="none" stroke="#3498db" stroke-width="2"/>
+                            </svg>
+                            <h3>Flexible</h3>
+                            <p>Extensible typeclass system</p>
+                        </div>
+                    </div>
+                    
+                    <h3>Why Evennia?</h3>
+                    <ul>
+                        <li><strong>Python-based:</strong> Leverages your existing Python knowledge</li>
+                        <li><strong>Django foundation:</strong> Built on a robust web framework</li>
+                        <li><strong>Active community:</strong> Helpful forums and documentation</li>
+                        <li><strong>Modern architecture:</strong> Supports both web and traditional clients</li>
+                        <li><strong>Production-ready:</strong> Scalable from classroom projects to full games</li>
+                    </ul>
+                    
+                    <p>Compared to alternatives like mud-pi (too limited) or custom Streamlit solutions (requires extensive development), Evennia offers the ideal balance of turnkey setup and extensibility.</p>
+                </div>
+            </div>
+            
+            <!-- Getting Started Page -->
+            <div id="getting-started" class="page">
+                <div class="card">
+                    <h1>Getting Started with Evennia</h1>
+                    <p>Let's set up your first Evennia project! Follow these steps to install Evennia and create your initial game environment.</p>
+                    
+                    <div class="svg-container">
+                        <svg width="250" height="200" viewBox="0 0 250 200" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="25" y="30" width="200" height="140" rx="5" fill="none" stroke="#2c3e50" stroke-width="2"/>
+                            <line x1="25" y1="60" x2="225" y2="60" stroke="#2c3e50" stroke-width="2"/>
+                            <circle cx="40" cy="45" r="5" fill="#e74c3c"/>
+                            <circle cx="60" cy="45" r="5" fill="#f1c40f"/>
+                            <circle cx="80" cy="45" r="5" fill="#2ecc71"/>
+                            <text x="35" y="80" font-family="monospace" font-size="10">$ pip install evennia</text>
+                            <text x="35" y="100" font-family="monospace" font-size="10">$ evennia --init mygame</text>
+                            <text x="35" y="120" font-family="monospace" font-size="10">$ cd mygame</text>
+                            <text x="35" y="140" font-family="monospace" font-size="10">$ evennia migrate</text>
+                            <text x="35" y="160" font-family="monospace" font-size="10">$ evennia start</text>
+                        </svg>
+                    </div>
+                    
+                    <h3>Step 1: Install Evennia</h3>
+                    <p>First, create a Python virtual environment (recommended), then install Evennia:</p>
+                    <pre>pip install evennia</pre>
+                    
+                    <h3>Step 2: Create a New Game Folder</h3>
+                    <p>Initialize a new game directory structure:</p>
+                    <pre>evennia --init mygame
+cd mygame</pre>
+                    
+                    <h3>Step 3: Initialize the Database</h3>
+                    <p>Set up the initial database schema:</p>
+                    <pre>evennia migrate</pre>
+                    
+                    <h3>Step 4: Start the Server</h3>
+                    <p>Launch your game server (you'll be prompted to create an admin account):</p>
+                    <pre>evennia start</pre>
+                    
+                    <h3>Step 5: Connect to Your Game</h3>
+                    <p>Your game is now running! Connect using:</p>
+                    <ul>
+                        <li><strong>Web client:</strong> <a href="http://localhost:4001">http://localhost:4001</a></li>
+                        <li><strong>Telnet:</strong> localhost:4000</li>
+                    </ul>
+                    
+                    <p>Log in with the admin account you created when starting the server.</p>
+                </div>
+            </div>
+            
+            <!-- Architecture Page -->
+            <div id="architecture" class="page">
+                <div class="card">
+                    <h1>Evennia Architecture</h1>
+                    <p>Understanding Evennia's architecture will help you build your game efficiently. Here's an overview of the key components:</p>
+                    
+                    <div class="svg-container">
+                        <svg width="300" height="250" viewBox="0 0 300 250" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="75" y="20" width="150" height="40" rx="5" fill="none" stroke="#3498db" stroke-width="2"/>
+                            <text x="110" y="45" font-family="monospace" font-size="16">TYPECLASSES</text>
+                            
+                            <rect x="25" y="100" width="100" height="40" rx="5" fill="none" stroke="#3498db" stroke-width="2"/>
+                            <text x="40" y="125" font-family="monospace" font-size="14">COMMANDS</text>
+                            
+                            <rect x="175" y="100" width="100" height="40" rx="5" fill="none" stroke="#3498db" stroke-width="2"/>
+                            <text x="200" y="125" font-family="monospace" font-size="14">SCRIPTS</text>
+                            
+                            <rect x="25" y="180" width="100" height="40" rx="5" fill="none" stroke="#3498db" stroke-width="2"/>
+                            <text x="35" y="205" font-family="monospace" font-size="12">SERVER CONF</text>
+                            
+                            <rect x="175" y="180" width="100" height="40" rx="5" fill="none" stroke="#3498db" stroke-width="2"/>
+                            <text x="195" y="205" font-family="monospace" font-size="14">DATABASE</text>
+                            
+                            <line x1="150" y1="60" x2="75" y2="100" stroke="#2c3e50" stroke-width="1.5"/>
+                            <line x1="150" y1="60" x2="225" y2="100" stroke="#2c3e50" stroke-width="1.5"/>
+                            <line x1="75" y1="140" x2="75" y2="180" stroke="#2c3e50" stroke-width="1.5"/>
+                            <line x1="225" y1="140" x2="225" y2="180" stroke="#2c3e50" stroke-width="1.5"/>
+                            <line x1="75" y1="140" x2="225" y2="180" stroke="#2c3e50" stroke-width="1.5" stroke-dasharray="5,5"/>
+                            <line x1="225" y1="140" x2="75" y2="180" stroke="#2c3e50" stroke-width="1.5" stroke-dasharray="5,5"/>
+                        </svg>
+                    </div>
+                    
+                    <h3>Typeclasses</h3>
+                    <p>Typeclasses are Python classes that extend database models, allowing you to create custom game objects with persistent data.</p>
+                    <ul>
+                        <li><strong>Characters</strong>: Player-controlled entities</li>
+                        <li><strong>Rooms</strong>: Locations in your game world</li>
+                        <li><strong>Objects</strong>: Items, weapons, treasures, etc.</li>
+                        <li><strong>Exits</strong>: Connections between rooms</li>
+                    </ul>
+                    
+                    <h3>Commands</h3>
+                    <p>Commands process player input and execute game actions. Each command is a Python class with a <code>func</code> method that defines its behavior.</p>
+                    
+                    <h3>Scripts</h3>
+                    <p>Scripts are persistent processes for timed events and background tasks, such as monster spawning, weather changes, or scheduled events.</p>
+                    
+                    <h3>Server Configuration</h3>
+                    <p>Server settings control everything from connection options to game mechanics. The main configuration file is <code>server/conf/settings.py</code>.</p>
+                    
+                    <h3>Database</h3>
+                    <p>All game objects are stored in a database, allowing the game state to persist across server restarts.</p>
+                </div>
+            </div>
+            
+            <!-- Game Areas Page -->
+            <div id="game-areas" class="page">
+                <div class="card">
+                    <h1>Game Areas & Player Types</h1>
+                    <p>Our MUD project is structured around four main areas, each appealing to different player types as described by Richard Bartle's player taxonomy.</p>
+                    
+                    <div class="svg-container">
+                        <svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="25" y="25" width="100" height="100" rx="5" fill="none" stroke="#3498db" stroke-width="2"/>
+                            <text x="45" y="75" font-family="monospace" font-size="12">CREATE</text>
+                            <text x="30" y="95" font-family="monospace" font-size="8">(The Forge)</text>
+                            
+                            <rect x="175" y="25" width="100" height="100" rx="5" fill="none" stroke="#3498db" stroke-width="2"/>
+                            <text x="190" y="75" font-family="monospace" font-size="12">EXPLAIN</text>
+                            <text x="175" y="95" font-family="monospace" font-size="8">(The Lore Halls)</text>
+                            
+                            <rect x="25" y="175" width="100" height="100" rx="5" fill="none" stroke="#3498db" stroke-width="2"/>
+                            <text x="60" y="225" font-family="monospace" font-size="12">CODE</text>
+                            <text x="25" y="245" font-family="monospace" font-size="8">(The Arcane Matrix)</text>
+                            
+                            <rect x="175" y="175" width="100" height="100" rx="5" fill="none" stroke="#3498db" stroke-width="2"/>
+                            <text x="190" y="225" font-family="monospace" font-size="12">EXPLORE</text>
+                            <text x="170" y="245" font-family="monospace" font-size="8">(The Neon Wilderness)</text>
+                            
+                            <circle cx="75" cy="75" r="10" fill="none" stroke="#e74c3c" stroke-width="2"/>
+                            <text x="72" cy="79" font-family="monospace" font-size="12">A</text>
+                            
+                            <circle cx="225" cy="75" r="10" fill="none" stroke="#27ae60" stroke-width="2"/>
+                            <text x="222" cy="79" font-family="monospace" font-size="12">S</text>
+                            
+                            <circle cx="75" cy="225" r="10" fill="none" stroke="#f1c40f" stroke-width="2"/>
+                            <text x="72" cy="229" font-family="monospace" font-size="12">E</text>
+                            
+                            <circle cx="225" cy="225" r="10" fill="none" stroke="#9b59b6" stroke-width="2"/>
+                            <text x="222" cy="229" font-family="monospace" font-size="12">K</text>
+                        </svg>
+                    </div>
+                    
+                    <h3>CREATE (The Forge)</h3>
+                    <ul>
+                        <li><strong>Appeals to:</strong> Achievers and Explorers</li>
+                        <li><strong>Features:</strong> Crafting systems, creating items, seeing tangible results</li>
+                        <li><strong>Similar to:</strong> Minecraft crafting, RPG gear progression</li>
+                    </ul>
+                    
+                    <h3>EXPLAIN (The Lore Halls)</h3>
+                    <ul>
+                        <li><strong>Appeals to:</strong> Socializers and Explorers</li>
+                        <li><strong>Features:</strong> NPC interactions, dialogue systems, uncovering lore</li>
+                        <li><strong>Similar to:</strong> Visual novels, dialogue-rich RPGs</li>
+                    </ul>
+                    
+                    <h3>CODE (The Arcane Matrix)</h3>
+                    <ul>
+                        <li><strong>Appeals to:</strong> Achievers and Explorers</li>
+                        <li><strong>Features:</strong> Mastering logical systems, discovering how things work</li>
+                        <li><strong>Similar to:</strong> Programming puzzles, logic games</li>
+                    </ul>
+                    
+                    <h3>EXPLORE (The Neon Wilderness)</h3>
+                    <ul>
+                        <li><strong>Appeals to:</strong> Explorers, Killers, and Achievers</li>
+                        <li><strong>Features:</strong> Mapping territories, tactical combat, finding rewards</li>
+                        <li><strong>Similar to:</strong> Dungeon crawlers, roguelikes</li>
+                    </ul>
+                    
+                    <p><strong>Key:</strong> A = Achievers, S = Socializers, E = Explorers, K = Killers</p>
+                </div>
+            </div>
+            
+            <!-- Commands Page -->
+            <div id="commands" class="page">
+                <div class="card">
+                    <h1>Basic Commands</h1>
+                    <p>Here are some essential commands for developing and managing your Evennia MUD.</p>
+                    
+                    <div class="svg-container">
+                        <svg width="250" height="200" viewBox="0 0 250 200" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="25" y="25" width="200" height="150" rx="5" fill="none" stroke="#2c3e50" stroke-width="2"/>
+                            <line x1="25" y1="50" x2="225" y2="50" stroke="#2c3e50" stroke-width="2"/>
+                            <rect x="35" y="65" width="180" height="25" rx="3" fill="#f5f5f5" stroke="#2c3e50" stroke-width="1"/>
+                            <text x="45" y="83" font-family="monospace" font-size="12">@create hall:rooms.Room</text>
+                            <rect x="35" y="100" width="180" height="25" rx="3" fill="#f5f5f5" stroke="#2c3e50" stroke-width="1"/>
+                            <text x="45" y="118" font-family="monospace" font-size="12">@dig north = kitchen</text>
+                            <rect x="35" y="135" width="180" height="25" rx="3" fill="#f5f5f5" stroke="#2c3e50" stroke-width="1"/>
+                            <text x="45" y="153" font-family="monospace" font-size="12">look</text>
+                        </svg>
+                    </div>
+                    
+                    <h3>Server Management</h3>
+                    <pre>
+# Start the Evennia server
+evennia start
+
+# Stop the Evennia server
+evennia stop
+
+# Restart the Evennia server
+evennia restart
+
+# Check server status
+evennia status
+                    </pre>
+                    
+                    <h3>In-Game Building</h3>
+                    <pre>
+# Create a new room
+@create hall:rooms.Room
+@desc hall = A spacious hall with high ceilings.
+
+# Create exits between rooms
+@dig north = kitchen
+@desc north = A doorway leading to the kitchen.
+
+# Create an object
+@create sword:objects.Object
+@desc sword = A shining steel sword.
+
+# Teleport to a room
+@tel hall
+
+# Set attributes on objects
+@set sword/damage = 10
+                    </pre>
+                    
+                    <h3>Basic Player Commands</h3>
+                    <pre>
+# Look at your surroundings
+look
+
+# Move in a direction
+north
+
+# Examine an object
+examine sword
+
+# Get an object
+get sword
+
+# Drop an object
+drop sword
+                    </pre>
+                </div>
+            </div>
+            
+            <!-- Next Steps Page -->
+            <div id="next-steps" class="page">
+                <div class="card">
+                    <h1>Next Steps</h1>
+                    <p>Ready to dive deeper into MUD development? Here are some suggestions for continuing your journey:</p>
+                    
+                    <div class="svg-container">
+                        <svg width="250" height="200" viewBox="0 0 250 200" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 100 L100 20 L230 100 L100 180 Z" fill="none" stroke="#2c3e50" stroke-width="2"/>
+                            <line x1="20" y1="100" x2="230" y2="100" stroke="#2c3e50" stroke-width="2"/>
+                            <line x1="100" y1="20" x2="100" y2="180" stroke="#2c3e50" stroke-width="2"/>
+                            <text x="45" y="80" font-family="monospace" font-size="10">LEARN</text>
+                            <text x="145" y="80" font-family="monospace" font-size="10">BUILD</text>
+                            <text x="45" y="130" font-family="monospace" font-size="10">SHARE</text>
+                            <text x="145" y="130" font-family="monospace" font-size="10">EXPAND</text>
+                        </svg>
+                    </div>
+                    
+                    <h3>Learning Resources</h3>
+                    <ul>
+                        <li><a href="https://www.evennia.com/docs/latest/" target="_blank">Evennia Documentation</a> - Comprehensive guides and API reference</li>
+                        <li><a href="https://www.evennia.com/docs/latest/Tutorials/Tutorial-Learning-Evennia-Step-by-Step" target="_blank">Step-by-Step Tutorial</a> - Create your first game elements</li>
+                        <li><a href="https://github.com/evennia/evennia/discussions" target="_blank">Evennia Community Forum</a> - Get help from other developers</li>
+                        <li><a href="http://mud.wikia.com/wiki/Main_Page" target="_blank">MUD Dev Wiki</a> - General MUD design concepts</li>
+                    </ul>
+                    
+                    <h3>Project Ideas</h3>
+                    <ul>
+                        <li><strong>Create a custom character class</strong> with special abilities</li>
+                        <li><strong>Design a puzzle room</strong> with interactive objects</li>
+                        <li><strong>Implement a simple combat system</strong> with different weapons</li>
+                        <li><strong>Build a crafting system</strong> for combining items</li>
+                        <li><strong>Create an NPC</strong> with dialogue options</li>
+                    </ul>
+                    
+                    <h3>Deployment Options</h3>
+                    <p>When you're ready to share your MUD with others, consider these hosting options:</p>
+                    <ul>
+                        <li><strong>DigitalOcean</strong> - $5/month basic droplet</li>
+                        <li><strong>Linode</strong> - $5/month entry-level plan</li>
+                        <li><strong>AWS Lightsail</strong> - Starting at $3.50/month</li>
+                    </ul>
+                    
+                    <p>Remember that due to websocket requirements, a VPS (Virtual Private Server) is recommended over services like PythonAnywhere or Streamlit Cloud.</p>
+                </div>
+            </div>
+            
+            <footer>
+                <p>Pythonic MUD - Building Text Worlds with Python | Created with Evennia</p>
+            </footer>
+        </div>
+    </div>
+    
+    <script>
+        // Simple navigation system
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('.nav-link');
+            const pages = document.querySelectorAll('.page');
+            
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetPage = this.getAttribute('data-page');
+                    
+                    // Update active link
+                    links.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show target page, hide others
+                    pages.forEach(page => {
+                        if (page.id === targetPage) {
+                            page.classList.add('active');
+                        } else {
+                            page.classList.remove('active');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

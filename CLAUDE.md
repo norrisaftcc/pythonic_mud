@@ -6,11 +6,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Python MUD (Multi-User Dungeon) game built using the Evennia framework. Evennia is a modern Python framework specifically designed for text-based multiplayer games, providing a complete foundation for MUD development.
 
+## System Requirements
+
+- **Python**: 3.10 or newer (Python 3.11+ recommended)
+- **Virtual Environment**: Recommended for isolation
+
 ## Core Commands
 
 ### Installation and Setup
 
 ```bash
+# Set up a Python 3.10+ virtual environment
+python3.11 -m venv evenv_new
+source evenv_new/bin/activate
+
 # Install Evennia (if needed)
 pip install evennia
 
@@ -20,6 +29,9 @@ cd mygame
 
 # Initialize the database
 evennia migrate
+
+# Create a superuser (or use the script provided)
+evennia createsuperuser
 
 # Start the server
 evennia start
@@ -89,8 +101,8 @@ Evennia uses a modular architecture based on Django and Twisted:
 
 4. **Web Interface**: Browser-based client and website
    - Located in `/mygame/web/`
-   - Static files in `static_overrides/`
-   - Templates in `template_overrides/`
+   - Static files in `static/` (formerly static_overrides)
+   - Templates in `templates/` (formerly template_overrides)
    - Built on Django's web framework
 
 5. **World Content**: Game-specific content definitions
@@ -165,6 +177,21 @@ These commands can be used when connected as a superuser:
 - **Telnet client**: localhost:4000
 - **Admin interface**: http://localhost:4001/admin/
 
+## Project-Specific Utilities
+
+### Superuser Creation Script
+
+If you encounter issues creating a superuser in non-interactive environments, use the provided script:
+
+```bash
+# Run the script to create a superuser programmatically
+python create_superuser.py
+```
+
+The script creates an admin user with the following credentials:
+- Username: admin
+- Password: sudosudo
+
 ## Deployment Considerations
 
 For deployment, a VPS (Virtual Private Server) is recommended due to the websocket requirements:
@@ -173,7 +200,7 @@ For deployment, a VPS (Virtual Private Server) is recommended due to the websock
 - AWS Lightsail (starting at $3.50/month)
 
 Basic deployment process:
-1. Set up a VPS with Python
+1. Set up a VPS with Python 3.10+
 2. Clone the repository
 3. Install requirements
 4. Configure the server for production use

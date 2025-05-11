@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        text {
+            font-family: 'Courier New', monospace;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .subtitle {
+            font-size: 16px;
+        }
+        .area-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .area-subtitle {
+            font-size: 14px;
+            font-style: italic;
+        }
+        .area-content {
+            font-size: 12px;
+        }
+        .player-type {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .area-box {
+            fill: white;
+            stroke: #2c3e50;
+            stroke-width: 2;
+            rx: 8;
+            ry: 8;
+        }
+        .achiever-icon {
+            fill: none;
+            stroke: #e74c3c;
+            stroke-width: 2;
+        }
+        .socializer-icon {
+            fill: none;
+            stroke: #27ae60;
+            stroke-width: 2;
+        }
+        .explorer-icon {
+            fill: none;
+            stroke: #f1c40f;
+            stroke-width: 2;
+        }
+        .killer-icon {
+            fill: none;
+            stroke: #9b59b6;
+            stroke-width: 2;
+        }
+        .connector {
+            stroke: #2c3e50;
+            stroke-width: 1.5;
+            stroke-dasharray: 5,5;
+            fill: none;
+        }
+    </style>
+
+    <!-- Title -->
+    <text x="300" y="40" text-anchor="middle" class="title">Bartle Player Types and Game Areas</text>
+    <text x="300" y="65" text-anchor="middle" class="subtitle">Designing for different play styles</text>
+
+    <!-- Create Area -->
+    <rect x="80" y="100" width="200" height="200" class="area-box"/>
+    <text x="180" y="135" text-anchor="middle" class="area-title">CREATE</text>
+    <text x="180" y="160" text-anchor="middle" class="area-subtitle">The Forge</text>
+    
+    <text x="100" y="190" class="area-content">• Crafting systems</text>
+    <text x="100" y="210" class="area-content">• Building & creating</text>
+    <text x="100" y="230" class="area-content">• Resource gathering</text>
+    <text x="100" y="250" class="area-content">• Item customization</text>
+
+    <!-- Achiever icon for Create -->
+    <circle cx="120" cy="135" r="15" class="achiever-icon"/>
+    <text x="120" y="140" text-anchor="middle" class="player-type">A</text>
+    
+    <!-- Explorer icon for Create -->
+    <circle cx="155" cy="135" r="15" class="explorer-icon"/>
+    <text x="155" y="140" text-anchor="middle" class="player-type">E</text>
+
+    <!-- Explain Area -->
+    <rect x="320" y="100" width="200" height="200" class="area-box"/>
+    <text x="420" y="135" text-anchor="middle" class="area-title">EXPLAIN</text>
+    <text x="420" y="160" text-anchor="middle" class="area-subtitle">The Lore Halls</text>
+    
+    <text x="340" y="190" class="area-content">• NPC interactions</text>
+    <text x="340" y="210" class="area-content">• Dialogue systems</text>
+    <text x="340" y="230" class="area-content">• World lore</text>
+    <text x="340" y="250" class="area-content">• Story progression</text>
+
+    <!-- Socializer icon for Explain -->
+    <circle cx="400" cy="135" r="15" class="socializer-icon"/>
+    <text x="400" y="140" text-anchor="middle" class="player-type">S</text>
+    
+    <!-- Explorer icon for Explain -->
+    <circle cx="435" cy="135" r="15" class="explorer-icon"/>
+    <text x="435" y="140" text-anchor="middle" class="player-type">E</text>
+
+    <!-- Code Area -->
+    <rect x="80" y="340" width="200" height="200" class="area-box"/>
+    <text x="180" y="375" text-anchor="middle" class="area-title">CODE</text>
+    <text x="180" y="400" text-anchor="middle" class="area-subtitle">The Arcane Matrix</text>
+    
+    <text x="100" y="430" class="area-content">• Logic puzzles</text>
+    <text x="100" y="450" class="area-content">• Pattern recognition</text>
+    <text x="100" y="470" class="area-content">• System mastery</text>
+    <text x="100" y="490" class="area-content">• Optimization challenges</text>
+
+    <!-- Achiever icon for Code -->
+    <circle cx="120" cy="375" r="15" class="achiever-icon"/>
+    <text x="120" y="380" text-anchor="middle" class="player-type">A</text>
+    
+    <!-- Explorer icon for Code -->
+    <circle cx="155" cy="375" r="15" class="explorer-icon"/>
+    <text x="155" y="380" text-anchor="middle" class="player-type">E</text>
+
+    <!-- Explore Area -->
+    <rect x="320" y="340" width="200" height="200" class="area-box"/>
+    <text x="420" y="375" text-anchor="middle" class="area-title">EXPLORE</text>
+    <text x="420" y="400" text-anchor="middle" class="area-subtitle">The Neon Wilderness</text>
+    
+    <text x="340" y="430" class="area-content">• World mapping</text>
+    <text x="340" y="450" class="area-content">• Combat encounters</text>
+    <text x="340" y="470" class="area-content">• Discovery rewards</text>
+    <text x="340" y="490" class="area-content">• Secret areas</text>
+
+    <!-- Explorer icon for Explore -->
+    <circle cx="380" cy="375" r="15" class="explorer-icon"/>
+    <text x="380" y="380" text-anchor="middle" class="player-type">E</text>
+    
+    <!-- Killer icon for Explore -->
+    <circle cx="415" cy="375" r="15" class="killer-icon"/>
+    <text x="415" y="380" text-anchor="middle" class="player-type">K</text>
+    
+    <!-- Achiever icon for Explore -->
+    <circle cx="450" cy="375" r="15" class="achiever-icon"/>
+    <text x="450" y="380" text-anchor="middle" class="player-type">A</text>
+
+    <!-- Connection lines -->
+    <path d="M180 300 L180 340" class="connector"/>
+    <path d="M420 300 L420 340" class="connector"/>
+    <path d="M280 200 L320 200" class="connector"/>
+    <path d="M280 440 L320 440" class="connector"/>
+
+    <!-- Legend -->
+    <rect x="80" y="560" width="440" height="30" fill="white" stroke="#2c3e50" stroke-width="1"/>
+    
+    <!-- Achiever -->
+    <circle cx="110" cy="575" r="10" class="achiever-icon"/>
+    <text x="110" y="580" text-anchor="middle" class="player-type">A</text>
+    <text x="130" y="580" class="area-content">Achievers</text>
+    
+    <!-- Socializer -->
+    <circle cx="210" cy="575" r="10" class="socializer-icon"/>
+    <text x="210" y="580" text-anchor="middle" class="player-type">S</text>
+    <text x="230" y="580" class="area-content">Socializers</text>
+    
+    <!-- Explorer -->
+    <circle cx="310" cy="575" r="10" class="explorer-icon"/>
+    <text x="310" y="580" text-anchor="middle" class="player-type">E</text>
+    <text x="330" y="580" class="area-content">Explorers</text>
+    
+    <!-- Killer -->
+    <circle cx="410" cy="575" r="10" class="killer-icon"/>
+    <text x="410" y="580" text-anchor="middle" class="player-type">K</text>
+    <text x="430" y="580" class="area-content">Killers</text>
+</svg>

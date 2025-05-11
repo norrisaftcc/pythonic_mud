@@ -29,7 +29,26 @@ __pycache__
 # For group efforts, comment out some or all of these.
 server/conf/secret_settings.py
 server/logs/*.log.*
+# Allow README files in static directory
 web/static/*
+!web/static/README.md
+!web/static/webclient/
+web/static/webclient/*
+!web/static/webclient/css/
+web/static/webclient/css/*
+!web/static/webclient/css/README.md
+!web/static/webclient/js/
+web/static/webclient/js/*
+!web/static/webclient/js/README.md
+!web/static/website/
+web/static/website/*
+!web/static/website/css/
+web/static/website/css/*
+!web/static/website/css/README.md
+!web/static/website/images/
+web/static/website/images/*
+!web/static/website/images/README.md
+
 web/media/*
 
 # Installer logs
