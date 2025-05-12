@@ -44,12 +44,12 @@
   - [ ] Implement skill learning and advancement
   - [ ] Create skill checks for gameplay mechanics
 
-## Sprint 3: Advanced Game Mechanics 🚀
-- [ ] Quest System Expansion
-  - [ ] Create structured quest tracking
+## Sprint 4: Advanced Game Mechanics 🚀
+- [ ] Extended Quest System
   - [ ] Implement quest chains and dependencies
-  - [ ] Design repeatable and procedurally generated quests
-  - [ ] Add more reward types (items, XP, skills)
+  - [ ] Create village trade route system with dynamic needs
+  - [ ] Design story-based quest lines
+  - [ ] Add advanced reward types (rare items, skills, faction reputation)
 - [ ] Advanced Combat
   - [ ] Add special attacks and abilities
   - [ ] Implement status effects in combat
