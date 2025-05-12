@@ -15,6 +15,7 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 """
 
 from evennia import default_cmds
+from commands import forge_commands, matrix_commands, lore_commands, wilderness_commands, character_commands
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
@@ -34,6 +35,33 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         #
         # any commands you add below will overload the default ones.
         #
+        # Forge/CREATE area commands
+        self.add(forge_commands.CmdCraft())
+        self.add(forge_commands.CmdGather())
+        self.add(forge_commands.CmdInspect())
+
+        # Matrix/CODE area commands
+        self.add(matrix_commands.CmdCode())
+        self.add(matrix_commands.CmdInspectPuzzle())
+        self.add(matrix_commands.CmdShowTerminals())
+
+        # Lore/EXPLAIN area commands
+        self.add(lore_commands.CmdTalk())
+        self.add(lore_commands.CmdLearn())
+        self.add(lore_commands.CmdQuest())
+        self.add(lore_commands.CmdNPCs())
+
+        # Wilderness/EXPLORE area commands
+        self.add(wilderness_commands.CmdExplore())
+        self.add(wilderness_commands.CmdAttack())
+        self.add(wilderness_commands.CmdStatus())
+        self.add(wilderness_commands.CmdMap())
+
+        # Character attribute commands
+        self.add(character_commands.CmdAttributes())
+        self.add(character_commands.CmdRoll())
+        self.add(character_commands.CmdLevelUp())
+        self.add(character_commands.CmdGiveXP())
 
 
 class AccountCmdSet(default_cmds.AccountCmdSet):

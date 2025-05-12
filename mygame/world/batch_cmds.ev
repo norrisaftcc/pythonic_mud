@@ -1,26 +1,503 @@
 #
-# A batch-command file is a way to build a game world
-# in a programmatic way, by placing a sequence of
-# build commands after one another. This allows for
-# using a real text editor to edit e.g. descriptions
-# rather than entering text on the command line.
+# Pythonic MUD - World Building Batch Commands
 #
-# A batch-command file is loaded with @batchprocess in-game:
+# This file contains commands to build the initial world layout
+# for the Pythonic MUD project. It sets up the Central Hub and 
+# the four themed areas based on Bartle player types.
 #
-#   @batchprocess[/interactive] tutorial_examples.batch_cmds
-#
-# A # as the first symbol on a line begins a comment and
-# marks the end of a previous command definition. This is important,
-# - every command must be separated by at least one line of comment.
-#
-# All supplied commands are given as normal, on their own line
-# and accept arguments in any format up until the first next
-# comment line begins. Extra whitespace is removed; an empty
-# line in a command definition translates into a newline.
-#
-# See `evennia/contrib/tutorial_examples/batch_cmds.ev` for
-# an example of a batch-command code. See also the batch-code
-# system for loading python-code this way.
+# Execute with: @batchprocess world.batch_cmds
 #
 
+# Create the Central Hub (Nexus Point)
+@create The Nexus Point:typeclasses.rooms.Room
+#
+@desc The Nexus Point = 
+A vast, circular chamber serves as the central connection point of this digital realm. 
+The domed ceiling glimmers with constellations of data points, shifting and 
+reorganizing in complex patterns. Four massive archways dominate the walls, each 
+pulsing with a different colored energy that seems to reflect its destination.
 
+In the center stands a holographic terminal displaying a rotating map of the 
+connected realms, each glowing with distinct purpose and possibility.
+
+Four paths beckon:
+- The eastern archway glows with amber light, tools and materials suspended within 
+  its frame. [The Forge]
+- To the north, a blue archway swirls with fragments of stories and dialogue. [The Lore Halls]
+- The western archway crackles with green code fragments, mathematical patterns weaving
+  through its threshold. [The Arcane Matrix]
+- The southern passage pulses with vibrant red energy, suggesting adventure and 
+  untamed wilderness. [The Neon Wilderness]
+#
+
+# Create The Forge entrance (CREATE area)
+@create The Forge Entrance:typeclasses.themed_rooms.ForgeRoom
+#
+@desc The Forge Entrance =
+The air here hums with creative potential. Workbenches line the walls, some hosting
+half-finished projects while others stand ready with pristine tools arranged with
+care. Holographic blueprints hover in the air, displaying complex designs that
+rotate slowly, revealing their inner workings.
+
+The warm amber light casts everything in a productive glow, and the distant sounds
+of crafting - hammers striking metal, the whir of precision tools, and the
+satisfying clicks of components locking into place - creates an inspiring
+atmosphere.
+
+This is the entrance to The Forge, where ideas become reality through the mastery
+of creation and crafting.
+#
+
+# Add a crafting forge to The Forge Entrance
+@create forge:typeclasses.themed_objects.Workbench
+#
+@desc forge =
+A massive forge dominates this station, its fires glowing with intense heat.
+An anvil rests beside it, surrounded by various hammers, tongs, and other
+metalworking tools. This is where raw materials are transformed into sturdy,
+functional items.
+#
+@set forge/workbench_type = forge
+#
+@set forge/crafting_recipes = {"metal ingot": ["metal ore"], "sword": ["metal ingot", "metal ingot", "wood"], "shield": ["metal ingot", "metal ingot"], "helmet": ["metal ingot", "metal ingot"], "tool": ["metal ingot", "wood"]}
+#
+@teleport forge = The Forge Entrance
+#
+
+# Create The Lore Halls entrance (EXPLAIN area)
+@create The Lore Halls Entrance:typeclasses.themed_rooms.LoreRoom
+#
+@desc The Lore Halls Entrance =
+A grand foyer lined with interactive displays awaits visitors to the Lore Halls.
+Projections of historical events play out like miniature theatrical performances
+in the air, while knowledge crystals embedded in pedestals glow with blue light,
+ready to share their contents with those who approach.
+
+The walls themselves seem alive with flowing text and stories, occasionally
+organizing into faces that speak brief welcomes or tantalizing fragments of lore
+before dissolving back into the stream of information.
+
+Several NPCs stand ready to engage in conversation, their appearance shifting
+subtly to reflect different personalities and knowledge domains. Here, dialogue
+and discovery intertwine to reveal the deeper meanings behind this digital realm.
+#
+
+# Add NPCs to The Lore Halls Entrance
+@create Professor Bytecode:typeclasses.themed_objects.NPC
+#
+@desc Professor Bytecode =
+An experienced-looking figure with glowing lines of code running across their robes.
+Their eyes seem to contain endless depths of knowledge, and they regard you with
+a patient, knowing expression. Small holographic diagrams occasionally materialize
+around them as they speak, illustrating their points with visual examples.
+#
+@set Professor Bytecode/dialogue_tree = {"greeting": "Welcome, student. I'm Professor Bytecode. What aspect of coding would you like to learn about today?", "python": "Python is a versatile language that values readability and simplicity. Perfect for beginners and experts alike!", "algorithms": "Algorithms are the heart of efficient programming. Understanding them will greatly enhance your coding abilities.", "objects": "Objects combine data and behavior into cohesive units. They're fundamental to modern programming paradigms.", "advice": "Remember: Always comment your code, use meaningful variable names, and test regularly. Future you will thank present you!"}
+#
+@set Professor Bytecode/mood = helpful
+#
+@set Professor Bytecode/knowledge = {"python": 10, "programming": 9, "algorithms": 8, "data structures": 9}
+#
+@set Professor Bytecode/services = ["teach", "evaluate code", "provide quests"]
+#
+@set Professor Bytecode/quest = {"name": "Debugging Challenge", "description": "I need someone to help identify bugs in student submissions. Bring me a 'bug report' item from the Neon Wilderness, and I'll reward you with valuable programming knowledge.", "requirements": {"items": ["bug report"]}, "reward": {"description": "Advanced debugging techniques", "item": "code fragment"}}
+#
+@teleport Professor Bytecode = The Lore Halls Entrance
+#
+
+# Add Archivist NPC
+@create Archivist Echo:typeclasses.themed_objects.NPC
+#
+@desc Archivist Echo =
+A shimmering, translucent figure that seems to be made of pure data. Multiple screens
+hover around them, displaying various information streams and historical records.
+Their form occasionally pixelates and reforms as they process new information.
+#
+@set Archivist Echo/dialogue_tree = {"greeting": "Oh! A visitor. I am Archivist Echo, keeper of digital histories. Are you here to help with my research?", "research": "I'm studying the patterns of code evolution across the digital realms. So fascinating how algorithms adapt!", "history": "The history of computing is filled with brilliant innovations and fascinating personalities. From Ada Lovelace to modern AI pioneers.", "help": "If you're willing to assist, I need someone to recover lost data fragments from the Matrix. The rewards would be... substantial.", "fragments": "The data fragments look like glowing blue crystals. They're scattered throughout the Arcane Matrix, especially in more complex puzzle areas."}
+#
+@set Archivist Echo/mood = busy
+#
+@set Archivist Echo/knowledge = {"history": 10, "digital archaeology": 8, "research methods": 9}
+#
+@set Archivist Echo/services = ["provide quests", "identify items", "reward completion"]
+#
+@set Archivist Echo/quest = {"name": "Data Recovery", "description": "I've lost track of valuable historical data fragments in the Arcane Matrix. Bring me a 'data crystal' and I'll share rare historical knowledge with you.", "requirements": {"items": ["data crystal"]}, "reward": {"description": "Access to the historical archives", "item": "ancient tome"}}
+#
+@teleport Archivist Echo = The Lore Halls Entrance
+#
+
+# Add a knowledge item
+@create digital lexicon:typeclasses.themed_objects.LoreObject
+#
+@desc digital lexicon =
+A hovering crystal that projects definitions and explanations when activated.
+The surface shimmers with a blue-white light, and as you examine it closer,
+symbols and diagrams seem to move just beneath its surface.
+#
+@set digital lexicon/knowledge_topics = ["programming", "algorithms", "data structures"]
+#
+@set digital lexicon/readable = True
+#
+@set digital lexicon/content = "Basic Algorithms: 1. Sorting - Methods to arrange data in a specific order. 2. Searching - Techniques to find data within a collection. 3. Graph Traversal - Ways to visit every node in a graph structure. Each algorithm has specific use cases and performance characteristics that make them suitable for different scenarios."
+#
+@teleport digital lexicon = The Lore Halls Entrance
+#
+
+# Create The Arcane Matrix entrance (CODE area)
+@create The Arcane Matrix Entrance:typeclasses.themed_rooms.MatrixRoom
+#
+@desc The Arcane Matrix Entrance =
+Green code cascades down transparent walls in this pristine, geometric chamber.
+The floor is marked with intricate circuit-like patterns that occasionally pulse
+with light as if processing information. Floating terminals hover at different
+heights, each displaying puzzles of varying complexity - from simple logical
+challenges to elaborate systems waiting to be decoded and mastered.
+
+In the center of the room, a complex three-dimensional puzzle slowly rotates,
+its components shifting and realigning in patterns that seem almost hypnotic.
+Small robots occasionally zip through the air, carrying data packets or stopping
+to reconfigure parts of the environment.
+
+This is the gateway to the Arcane Matrix, where logic, code, and problem-solving
+reign supreme.
+#
+
+# Add coding terminals to The Arcane Matrix Entrance
+@create beginner terminal:typeclasses.themed_objects.Terminal
+#
+@desc beginner terminal =
+A simple terminal with a friendly interface designed for newcomers to the art of coding.
+The screen displays a gentle blue glow and the interface is clean and uncluttered.
+This terminal hosts basic coding challenges to help you learn the fundamental concepts.
+#
+@set beginner terminal/puzzle_type = code
+#
+@set beginner terminal/difficulty = 1
+#
+@set beginner terminal/current_code = "# Write a function that prints 'Hello, World!'"
+#
+@set beginner terminal/expected_output = "Hello, World!"
+#
+@set beginner terminal/hints = ["Use the print() function", "The message should be exactly 'Hello, World!' including the comma and exclamation mark", "Try this: print('Hello, World!')"]
+#
+@teleport beginner terminal = The Arcane Matrix Entrance
+#
+
+# Add a more advanced terminal
+@create logic terminal:typeclasses.themed_objects.Terminal
+#
+@desc logic terminal =
+A more sophisticated terminal with circuitry visible beneath its transparent casing.
+The interface is more complex, displaying multiple sections for input, output, and
+debugging. This terminal hosts logic-based programming challenges that will test
+your ability to think algorithmically.
+#
+@set logic terminal/puzzle_type = code
+#
+@set logic terminal/difficulty = 3
+#
+@set logic terminal/current_code = "# Write a function that checks if a number is prime"
+#
+@set logic terminal/expected_output = "True"
+#
+@set logic terminal/hints = ["A prime number is only divisible by 1 and itself", "Try checking all possible divisors", "Don't forget to call your function with a test case, like: print(is_prime(7))"]
+#
+@teleport logic terminal = The Arcane Matrix Entrance
+#
+
+# Create The Neon Wilderness entrance (EXPLORE area)
+@create The Neon Wilderness Entrance:typeclasses.themed_rooms.WildernessRoom
+#
+@desc The Neon Wilderness Entrance =
+The orderly structure of the hub gives way to a riotous explosion of color and
+unpredictability. The boundaries of this chamber seem constantly in flux, with
+edges that blur and shift like a glitching video game. Vegetation glowing with
+bioluminescent properties sprouts from impossible surfaces, while creatures
+made of light and code scurry into hiding places as visitors approach.
+
+A weathered map terminal stands near the entrance, though its display seems to
+update in real-time, suggesting that the wilderness beyond refuses to remain
+static. The air carries distant sounds of challenges and opportunities: the
+clash of combat, the rewarding chime of discoveries, and the ambient procedural
+music of a world being generated on-the-fly.
+
+Adventure, danger, and discovery await those who venture into the Neon Wilderness.
+#
+
+# Create deeper wilderness areas
+@create Glitching Forest:typeclasses.themed_rooms.WildernessRoom
+#
+@desc Glitching Forest =
+A dense forest of towering data structures stretches in all directions, each "tree"
+formed of shifting code fragments and polygonal shapes that occasionally flicker and
+glitch. The canopy above filters light into pixelated patterns on the ground, while
+the undergrowth consists of smaller processes and subroutines that react to your presence.
+
+Strange sounds emanate from deeper in the forest - some like digital wildlife, others
+more mechanical and threatening. Paths form and deform through the trees, making
+navigation challenging without careful exploration.
+
+You sense this would be a good area to gather resources, but dangers likely lurk among
+the trees.
+#
+@set Glitching Forest/danger_level = 3
+#
+@set Glitching Forest/hidden_exits = {"east": {"destination": "Corrupted Data Lake", "difficulty": 4, "desc": "A barely visible path leading deeper into the wilderness, marked with strange glowing symbols."}}
+#
+
+@create Corrupted Data Lake:typeclasses.themed_rooms.WildernessRoom
+#
+@desc Corrupted Data Lake =
+A vast lake of shimmering, liquid-like code spreads before you, its surface occasionally
+disrupted by corrupted data bubbling up from below. The edges of the lake glow with a
+sickly red light, suggesting instability and danger. Strange creatures can be seen
+moving beneath the surface, their shapes distorted and aggressive.
+
+Around the lake's perimeter, crystalline data formations jut from the ground, some
+containing valuable uncorrupted code fragments that could be salvaged by the careful
+explorer. Several paths lead away from the lake, some more obvious than others.
+
+The area has a higher concentration of hostiles than other places you've explored.
+#
+@set Corrupted Data Lake/danger_level = 7
+#
+@set Corrupted Data Lake/encounter_chance = 0.4
+#
+@set Corrupted Data Lake/hidden_exits = {"south": {"destination": "The Neon Wilderness Entrance", "difficulty": 3, "desc": "A partially hidden path leading back toward safer territory."}, "down": {"destination": "The Nexus Point", "difficulty": 8, "desc": "A concealed emergency exit that leads directly back to the Nexus."}}
+#
+
+# Add a pre-spawned opponent
+@create bug creature:typeclasses.themed_objects.Opponent
+#
+@desc bug creature =
+A skittering entity made of corrupt code, with too many legs and erratic movement patterns.
+Its surface occasionally glitches, revealing fragments of broken data underneath. The
+creature seems aggressive, constantly searching for new data to corrupt and consume.
+#
+@set bug creature/attributes.values = {"strength": 8, "dexterity": 14, "wisdom": 6, "health": 50, "max_health": 50, "mana": 20, "max_mana": 20, "level": 2, "experience": 0}
+#
+@set bug creature/combat_style = melee
+#
+@set bug creature/loot_table = {"code fragment": 0.7, "bug report": 0.3}
+#
+@teleport bug creature = The Neon Wilderness Entrance
+#
+
+# Create the Tutorial Hub area
+@create Tutorial Hub:typeclasses.tutorial_rooms.TutorialRoom
+#
+@desc Tutorial Hub =
+Welcome to the Pythonic MUD tutorial area! This central hub connects to specialized
+tutorial rooms for each of the game's four main areas. Each room will teach you
+about the unique mechanics and commands available in that area.
+
+Four clearly marked paths lead from this hub:
+- To the east: Crafting Tutorial (CREATE)
+- To the north: Dialogue Tutorial (EXPLAIN)
+- To the west: Coding Tutorial (CODE)
+- To the south: Exploration Tutorial (EXPLORE)
+
+Type 'tutorial' at any time for help with game basics, or 'tutorial next' for
+step-by-step guidance on what to try in each area.
+#
+@set Tutorial Hub/tutorial_welcome = "|gWelcome to the Pythonic MUD Tutorial!|n\nThis area will help you learn the basics of all four game areas: CREATE (crafting), EXPLAIN (dialogue), CODE (programming), and EXPLORE (wilderness). Type 'tutorial' for help or 'look' to see where you can go."
+#
+@set Tutorial Hub/tutorial_help = "This tutorial hub connects to four specialized training rooms, each teaching a different aspect of gameplay. Use the exits to visit each area, and type 'tutorial' in each room for specific guidance on the mechanics there."
+#
+@set Tutorial Hub/tutorial_next = "Start by checking your surroundings with 'look'. Then, choose an area to explore first by using an exit like 'east' or 'e' to go to the Crafting Tutorial."
+#
+@set Tutorial Hub/tutorial_topics = {"basics": "Basic commands include 'look' (or 'l'), movement commands like 'north' (or 'n'), 'get <item>', 'drop <item>', 'inventory' (or 'i'), and 'help'.", "areas": "The game has four main areas: CREATE (crafting), EXPLAIN (dialogue), CODE (programming), and EXPLORE (wilderness). Each area has unique mechanics and commands.", "tutorial": "Each tutorial room teaches you about a specific area of the game. Type 'tutorial' in each room for area-specific guidance."}
+#
+
+# Create the CREATE Tutorial room
+@create Crafting Tutorial:typeclasses.tutorial_rooms.CreateTutorialRoom
+#
+@desc Crafting Tutorial =
+This bright workshop introduces the basics of the crafting system. Several sample
+materials are arranged on shelves along the walls, and a simple workbench stands
+in the center of the room.
+
+A sign on the wall explains: "In the CREATE area, you can gather materials and craft
+items at workbenches. Try using the 'gather' command to collect materials, then use
+'craft' at the workbench to create something."
+
+Type 'tutorial' for more detailed help on crafting mechanics.
+#
+
+# Create the CODE Tutorial room
+@create Coding Tutorial:typeclasses.tutorial_rooms.CodeTutorialRoom
+#
+@desc Coding Tutorial =
+This sleek, geometric room introduces the basics of the coding puzzles system. A
+simplified terminal sits on a desk in the center, displaying a beginner-friendly
+programming challenge.
+
+A sign on the wall explains: "In the CODE area, you can solve programming puzzles
+at terminals. Try using the 'terminals' command to see available puzzle terminals,
+'puzzle <terminal>' to examine one, and 'code' to write and execute Python code."
+
+Type 'tutorial' for more detailed help on coding mechanics.
+#
+
+# Create the EXPLAIN Tutorial room
+@create Dialogue Tutorial:typeclasses.tutorial_rooms.LoreTutorialRoom
+#
+@desc Dialogue Tutorial =
+This welcoming chamber introduces the basics of the dialogue and knowledge system.
+A friendly tutorial NPC stands ready to converse with you, and a glowing knowledge
+crystal sits on a pedestal nearby.
+
+A sign on the wall explains: "In the EXPLAIN area, you can talk with NPCs and learn
+from them or from knowledge items. Try using the 'npcs' command to see who's available,
+'talk <npc>' to start a conversation, and 'learn from <npc>' to acquire knowledge."
+
+Type 'tutorial' for more detailed help on dialogue mechanics.
+#
+
+# Create the EXPLORE Tutorial room
+@create Exploration Tutorial:typeclasses.tutorial_rooms.ExploreTutorialRoom
+#
+@desc Exploration Tutorial =
+This simulated wilderness chamber introduces the basics of the exploration system.
+The room features areas to explore, a safe practice treasure to find, and a hidden
+exit to discover.
+
+A sign on the wall explains: "In the EXPLORE area, you can explore environments,
+discover hidden features, and engage in combat. Try using the 'explore' command to
+search the area, 'status' to check your health, and 'map' to track exploration."
+
+Type 'tutorial' for more detailed help on exploration mechanics.
+#
+
+# Add tutorial objects
+
+# Create a tutorial workbench
+@create tutorial workbench:typeclasses.themed_objects.Workbench
+#
+@desc tutorial workbench =
+A simplified workbench designed for practice. It has clear instructions and labeled
+parts to help beginners understand the crafting process.
+#
+@set tutorial workbench/workbench_type = tutorial
+#
+@set tutorial workbench/crafting_recipes = {"training tool": ["training metal"], "practice weapon": ["training metal", "practice wood"]}
+#
+@teleport tutorial workbench = Crafting Tutorial
+#
+
+# Create a tutorial terminal
+@create tutorial terminal:typeclasses.themed_objects.Terminal
+#
+@desc tutorial terminal =
+A beginner-friendly terminal with a simplified interface. The screen displays a basic
+Python coding challenge with helpful hints and explanations.
+#
+@set tutorial terminal/puzzle_type = code
+#
+@set tutorial terminal/difficulty = 1
+#
+@set tutorial terminal/current_code = "# Print the message 'Hello, Python!'"
+#
+@set tutorial terminal/expected_output = "Hello, Python!"
+#
+@set tutorial terminal/hints = ["Use the print() function to display text", "Make sure to use quotes around the text string", "Try writing: print('Hello, Python!')"]
+#
+@teleport tutorial terminal = Coding Tutorial
+#
+
+# Create a tutorial NPC
+@create Tutorial Guide:typeclasses.themed_objects.NPC
+#
+@desc Tutorial Guide =
+A friendly holographic assistant designed to help new players understand the dialogue
+system. They appear as a glowing blue figure with a helpful demeanor.
+#
+@set Tutorial Guide/dialogue_tree = {"greeting": "Hello there! I'm the Tutorial Guide. I can teach you about the dialogue system. What would you like to know?", "dialogue": "The dialogue system lets you talk to NPCs about different topics. Try using 'talk <npc> about <topic>' to discuss specific subjects.", "knowledge": "You can learn from NPCs and knowledge items using the 'learn' command. Try 'learn from <source>' to see what topics are available.", "quests": "NPCs can give you quests to complete. Use 'quest <npc>' to get a quest, 'quest/list' to see your active quests, and 'quest/complete <quest> with <npc>' to complete them."}
+#
+@set Tutorial Guide/mood = helpful
+#
+@set Tutorial Guide/knowledge = {"game basics": 10, "dialogue system": 10, "quests": 10}
+#
+@set Tutorial Guide/services = ["teach", "provide quests"]
+#
+@set Tutorial Guide/quest = {"name": "Dialogue Practice", "description": "I'd like you to practice the dialogue system. Learn about the 'dialogue system' topic from me, then come back to complete this quest.", "requirements": {}, "reward": {"description": "A better understanding of the dialogue system"}}
+#
+@teleport Tutorial Guide = Dialogue Tutorial
+#
+
+# Create a tutorial knowledge item
+@create tutorial crystal:typeclasses.themed_objects.LoreObject
+#
+@desc tutorial crystal =
+A small, glowing crystal that contains basic knowledge about the game. It's designed
+to help new players learn the fundamental concepts.
+#
+@set tutorial crystal/knowledge_topics = ["game basics", "commands", "areas"]
+#
+@set tutorial crystal/readable = True
+#
+@set tutorial crystal/content = "Pythonic MUD combines four gameplay styles: crafting (CREATE), dialogue (EXPLAIN), programming (CODE), and exploration (EXPLORE). Each area has unique commands and mechanics tailored to different player preferences."
+#
+@teleport tutorial crystal = Dialogue Tutorial
+#
+
+# Create a tutorial practice target
+@create training dummy:typeclasses.themed_objects.Opponent
+#
+@desc training dummy =
+A harmless training dummy designed for combat practice. It doesn't fight back and
+regenerates quickly, making it perfect for learning the combat system safely.
+#
+@set training dummy/health = 20
+#
+@set training dummy/max_health = 20
+#
+@set training dummy/attack_power = 0  # Does no damage
+#
+@set training dummy/defense = 0
+#
+@set training dummy/loot_table = {"practice token": 1.0}  # Always drops a token
+#
+@teleport training dummy = Exploration Tutorial
+#
+
+# Connect all tutorial rooms
+@dig east;e = Tutorial Hub,Crafting Tutorial
+#
+@dig west;w = Crafting Tutorial,Tutorial Hub
+#
+@dig north;n = Tutorial Hub,Dialogue Tutorial
+#
+@dig south;s = Dialogue Tutorial,Tutorial Hub
+#
+@dig west;w = Tutorial Hub,Coding Tutorial
+#
+@dig east;e = Coding Tutorial,Tutorial Hub
+#
+@dig south;s = Tutorial Hub,Exploration Tutorial
+#
+@dig north;n = Exploration Tutorial,Tutorial Hub
+#
+
+# Connect Tutorial Hub to Nexus
+@dig nexus;hub = Tutorial Hub,The Nexus Point
+#
+@dig tutorial;tut = The Nexus Point,Tutorial Hub
+#
+
+# Connect the main game rooms with exits
+@dig east;e = The Nexus Point,The Forge Entrance
+#
+@dig west;w = The Forge Entrance,The Nexus Point
+#
+@dig north;n = The Nexus Point,The Lore Halls Entrance
+#
+@dig south;s = The Lore Halls Entrance,The Nexus Point
+#
+@dig west;w = The Nexus Point,The Arcane Matrix Entrance
+#
+@dig east;e = The Arcane Matrix Entrance,The Nexus Point
+#
+@dig south;s = The Nexus Point,The Neon Wilderness Entrance
+#
+@dig north;n = The Neon Wilderness Entrance,The Nexus Point
+#
