@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Concepts - Radiant Quest System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Source+Code+Pro&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Pythonic MUD</h1>
+            <div class="subtitle">Building a Radiant Quest System</div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="concepts.html" class="active">Core Concepts</a></li>
+                <li><a href="implementation.html">Implementation</a></li>
+                <li><a href="maze.html">Maze Generation</a></li>
+                <li><a href="quests.html">Quest System</a></li>
+                <li><a href="extensions.html">Extensions</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Core Concepts</h2>
+            <p class="lead">Understanding the fundamental building blocks of a radiant quest system</p>
+            <div class="diagram">
+                <img src="images/quest_architecture.png" alt="Quest System Architecture" onerror="this.src='https://via.placeholder.com/800x400?text=Quest+System+Architecture'">
+                <p class="caption">High-level architecture of the radiant quest system</p>
+            </div>
+        </section>
+
+        <section>
+            <h3>What Makes Quests "Radiant"?</h3>
+            <p>
+                Traditional quests in games typically have fixed parameters: a specific NPC gives a specific task that involves going to a specific location
+                to find or defeat a specific target. While this allows for carefully crafted storylines, it can limit replayability.
+            </p>
+            <p>
+                Radiant quests, by contrast, use a template-based approach with variable components:
+            </p>
+            <ul>
+                <li><strong>Random selection from pools</strong> of NPCs, locations, targets, and rewards</li>
+                <li><strong>Procedural generation</strong> of quest parameters based on player level and game state</li>
+                <li><strong>Periodic refreshing</strong> of available quests to maintain engagement</li>
+                <li><strong>Scalable difficulty</strong> that adjusts based on player progression</li>
+            </ul>
+            <div class="tip">
+                <strong>Tip:</strong> The key to a successful radiant quest system is balancing randomness with meaningfulness. 
+                Too random, and quests feel disconnected from the game world; too rigid, and they lose their dynamic appeal.
+            </div>
+        </section>
+
+        <section>
+            <h3>Key Components of Our System</h3>
+            
+            <h4>1. Quest Templates</h4>
+            <p>
+                Quest templates define the basic structure of a quest type without specifying the exact parameters. For our Boardwalk maze system, 
+                we'll create templates like:
+            </p>
+            <ul>
+                <li>"Fetch an item with property X and property Y"</li>
+                <li>"Collect N items all sharing property Z"</li>
+                <li>"Find the unique item that has properties A, B, and C"</li>
+            </ul>
+            <p>
+                Each template contains placeholder variables that get filled in when a quest is generated.
+            </p>
+
+            <h4>2. Item Property System</h4>
+            <p>
+                To support our fetch quests, we need a system to define and query object properties. For our maze items, we'll track:
+            </p>
+            <div class="two-columns">
+                <div>
+                    <p><strong>Basic Properties:</strong></p>
+                    <ul>
+                        <li>Color (red, blue, green, yellow, etc.)</li>
+                        <li>Size (small, medium, large)</li>
+                        <li>Shape (ball, cube, pyramid, etc.)</li>
+                    </ul>
+                </div>
+                <div>
+                    <p><strong>Advanced Properties (optional):</strong></p>
+                    <ul>
+                        <li>Material (metal, wood, glass, etc.)</li>
+                        <li>Weight (light, medium, heavy)</li>
+                        <li>Special attributes (glowing, floating, etc.)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h4>3. Procedural Maze Generation</h4>
+            <p>
+                Our maze will be procedurally generated each time it's entered, with:
+            </p>
+            <ul>
+                <li>Random layout of rooms and corridors</li>
+                <li>Procedural placement of items with varied properties</li>
+                <li>Difficulty scaling based on player level</li>
+                <li>Items placed to match currently active quests</li>
+            </ul>
+
+            <h4>4. Quest State Tracking</h4>
+            <p>
+                The system needs to track:
+            </p>
+            <ul>
+                <li>Which quests are available to each player</li>
+                <li>Which quests are currently active</li>
+                <li>Progress toward completion</li>
+                <li>Quest cooldown timers</li>
+                <li>Reward history to adjust future rewards</li>
+            </ul>
+
+            <h4>5. Token Economy</h4>
+            <p>
+                The Boardwalk's token economy serves as both reward and gameplay loop:
+            </p>
+            <ul>
+                <li>Tokens earned from completing quests</li>
+                <li>Tokens spent on Boardwalk games and attractions</li>
+                <li>Games provide different rewards (items, XP, more tokens)</li>
+                <li>Higher-level quests yield more tokens</li>
+            </ul>
+        </section>
+
+        <section>
+            <h3>Object-Oriented Design Patterns</h3>
+            <p>
+                Our implementation will leverage several OOP design patterns:
+            </p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Factory Pattern</h4>
+                    <p>For generating quest instances from templates</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Strategy Pattern</h4>
+                    <p>For different maze generation algorithms</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Observer Pattern</h4>
+                    <p>For tracking quest progress events</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Decorator Pattern</h4>
+                    <p>For adding properties to maze items</p>
+                </div>
+            </div>
+
+            <div class="note">
+                <strong>Note:</strong> While we'll use these design patterns conceptually, we'll adapt them to work within 
+                Evennia's architecture, which already provides certain abstractions through its typeclass system.
+            </div>
+        </section>
+
+        <section>
+            <h3>Integration with Existing Systems</h3>
+            <p>
+                Our radiant quest system will integrate with the following existing components of the Pythonic MUD:
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Existing System</th>
+                        <th>Integration Point</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Character Attributes</td>
+                        <td>Quest difficulty scaling, reward calculations</td>
+                    </tr>
+                    <tr>
+                        <td>XP and Leveling</td>
+                        <td>Quest rewards include XP</td>
+                    </tr>
+                    <tr>
+                        <td>NPC Dialog System</td>
+                        <td>Quest acceptance and turn-in</td>
+                    </tr>
+                    <tr>
+                        <td>World Building</td>
+                        <td>Boardwalk area integrated into main world</td>
+                    </tr>
+                    <tr>
+                        <td>Inventory System</td>
+                        <td>Item collection and quest verification</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="navigation-links">
+            <a href="index.html" class="prev-link">← Previous: Overview</a>
+            <a href="implementation.html" class="next-link">Next: Implementation →</a>
+        </section>
+    </main>
+
+    <footer>
+        <p>Pythonic MUD - Educational Game Development Project</p>
+        <p class="copyright">© 2024 Pythonic MUD Team</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radiant Quest System - Pythonic MUD</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Source+Code+Pro&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Pythonic MUD</h1>
+            <div class="subtitle">Building a Radiant Quest System</div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Overview</a></li>
+                <li><a href="concepts.html">Core Concepts</a></li>
+                <li><a href="implementation.html">Implementation</a></li>
+                <li><a href="maze.html">Maze Generation</a></li>
+                <li><a href="quests.html">Quest System</a></li>
+                <li><a href="extensions.html">Extensions</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Radiant Quest System</h2>
+            <p class="lead">Creating dynamic, procedurally generated quests in an Evennia-based MUD</p>
+            <div class="hero-image">
+                <img src="images/quest_hero.png" alt="Quest System Visualization" onerror="this.src='https://via.placeholder.com/800x400?text=Radiant+Quest+System'">
+            </div>
+        </section>
+
+        <section class="introduction">
+            <h3>Introduction</h3>
+            <p>
+                Radiant quests (a term popularized by Bethesda games like Skyrim) are procedurally generated, repeatable missions that provide variety 
+                and replayability to a game. Unlike static quests with fixed objectives, radiant quests dynamically select from a pool of 
+                possible locations, objectives, and rewards to create unique experiences each time.
+            </p>
+            <p>
+                In this tutorial, we'll build a complete radiant quest system for our Pythonic MUD, centered around a Boardwalk area 
+                with mini-games and randomized fetch quests. We'll cover everything from designing the data structures to implementing 
+                the gameplay mechanics, and we'll explore how these systems can be extended for more complex gameplay.
+            </p>
+        </section>
+
+        <section class="overview">
+            <h3>What We'll Build</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>Boardwalk Area</h4>
+                    <p>A central hub with NPCs, games, and attractions where players can spend tokens earned from quests.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Random Maze Generation</h4>
+                    <p>A procedurally generated maze that changes layout and item placement with each visit.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Quest Generator</h4>
+                    <p>A system that creates varied objectives based on item properties like color, size, and shape.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Token Economy</h4>
+                    <p>A reward system where players earn tokens to spend on Boardwalk games and attractions.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="prerequisites">
+            <h3>Prerequisites</h3>
+            <p>
+                To follow along with this tutorial, you'll need:
+            </p>
+            <ul>
+                <li>Working Evennia MUD installation (version 0.9.5+)</li>
+                <li>Basic understanding of Python and object-oriented programming</li>
+                <li>Familiarity with MUD concepts and Evennia's architecture</li>
+                <li>The character attributes system we implemented in the previous sprint</li>
+            </ul>
+            <div class="note">
+                <strong>Note:</strong> All code in this tutorial is designed to integrate with the Pythonic MUD project 
+                structure. If you're using a different setup, you may need to adapt the import statements and class 
+                inheritance patterns.
+            </div>
+        </section>
+
+        <section class="navigation-links">
+            <a href="concepts.html" class="next-link">Next: Core Concepts →</a>
+        </section>
+    </main>
+
+    <footer>
+        <p>Pythonic MUD - Educational Game Development Project</p>
+        <p class="copyright">© 2024 Pythonic MUD Team</p>
+    </footer>
+</body>
+</html>

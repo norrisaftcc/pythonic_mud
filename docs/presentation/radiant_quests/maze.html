@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maze Generation - Radiant Quest System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Source+Code+Pro&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Pythonic MUD</h1>
+            <div class="subtitle">Building a Radiant Quest System</div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="concepts.html">Core Concepts</a></li>
+                <li><a href="implementation.html">Implementation</a></li>
+                <li><a href="maze.html" class="active">Maze Generation</a></li>
+                <li><a href="quests.html">Quest System</a></li>
+                <li><a href="extensions.html">Extensions</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Maze Generation</h2>
+            <p class="lead">Creating dynamic, procedurally generated mazes for explorers</p>
+            <div class="diagram">
+                <img src="images/maze_diagram.png" alt="Maze Generation Diagram" onerror="this.src='https://via.placeholder.com/800x400?text=Maze+Generation+Diagram'">
+                <p class="caption">Example of a procedurally generated maze layout</p>
+            </div>
+        </section>
+
+        <section>
+            <h3>Maze Generation Algorithms</h3>
+            <p>
+                For our Boardwalk maze, we'll implement a random maze generator that creates new layouts each time. We'll use 
+                the depth-first search algorithm with backtracking, a popular approach for generating perfect mazes (mazes with no loops).
+            </p>
+            
+            <div class="two-columns">
+                <div>
+                    <h4>Depth-First Maze Algorithm:</h4>
+                    <ol>
+                        <li>Start at a random cell and mark it as visited</li>
+                        <li>While there are unvisited cells:
+                            <ol>
+                                <li>If the current cell has unvisited neighbors:
+                                    <ol>
+                                        <li>Choose a random unvisited neighbor</li>
+                                        <li>Remove the wall between the current cell and the chosen neighbor</li>
+                                        <li>Move to the chosen neighbor and mark it as visited</li>
+                                    </ol>
+                                </li>
+                                <li>Otherwise, backtrack to the most recent cell with unvisited neighbors</li>
+                            </ol>
+                        </li>
+                    </ol>
+                </div>
+                <div>
+                    <h4>Maze Properties:</h4>
+                    <ul>
+                        <li><strong>Perfect Maze:</strong> Exactly one path between any two points</li>
+                        <li><strong>Fully Connected:</strong> All cells are reachable</li>
+                        <li><strong>Random Layout:</strong> Different every time</li>
+                        <li><strong>Configurable Size:</strong> Adjust difficulty with maze dimensions</li>
+                        <li><strong>Entrance and Exit:</strong> Designated start and end points</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="note">
+                <strong>Note:</strong> For simplicity in our MUD implementation, we'll represent the maze as a grid of connected rooms
+                rather than a visual grid. This fits better with Evennia's room-based navigation system.
+            </div>
+        </section>
+
+        <section>
+            <h3>Implementing the Maze Generator</h3>
+            <pre><code># In mygame/typeclasses/maze.py
+import random
+from enum import Enum
+from evennia import create_object
+from evennia.utils import list_to_string
+
+class Direction(Enum):
+    NORTH = "north"
+    EAST = "east"
+    SOUTH = "south"
+    WEST = "west"
+
+class MazeGenerator:
+    """
+    Generates a random maze using depth-first search with backtracking.
+    The maze is represented as a grid of rooms connected by exits.
+    """
+    
+    def __init__(self, width=5, height=5, entrance_room=None):
+        """
+        Initialize the maze generator.
+        
+        Args:
+            width (int): Width of the maze in rooms
+            height (int): Height of the maze in rooms
+            entrance_room: The room that connects to the maze entrance
+        """
+        self.width = width
+        self.height = height
+        self.entrance_room = entrance_room
+        self.grid = [[None for _ in range(width)] for _ in range(height)]
+        self.entrance = None
+        self.exit = None
+        
+    def generate(self):
+        """
+        Generate the maze layout and create the rooms.
+        
+        Returns:
+            tuple: (entrance_room, exit_room)
+        """
+        # Initialize the grid cells (1 = wall, 0 = passage)
+        cells = [[1 for _ in range(self.width * 2 + 1)] for _ in range(self.height * 2 + 1)]
+        
+        # Create a stack for the depth-first search
+        stack = []
+        
+        # Choose a random starting point
+        start_x = random.randint(0, self.width - 1)
+        start_y = random.randint(0, self.height - 1)
+        
+        # Mark the starting cell as visited
+        cells[start_y * 2 + 1][start_x * 2 + 1] = 0
+        stack.append((start_x, start_y))
+        
+        # Run the depth-first search algorithm
+        while stack:
+            current_x, current_y = stack[-1]
+            
+            # Find unvisited neighbors
+            neighbors = []
+            
+            # Check north neighbor
+            if current_y > 0 and cells[(current_y - 1) * 2 + 1][current_x * 2 + 1] == 1:
+                neighbors.append((current_x, current_y - 1, Direction.NORTH))
+                
+            # Check east neighbor
+            if current_x < self.width - 1 and cells[current_y * 2 + 1][(current_x + 1) * 2 + 1] == 1:
+                neighbors.append((current_x + 1, current_y, Direction.EAST))
+                
+            # Check south neighbor
+            if current_y < self.height - 1 and cells[(current_y + 1) * 2 + 1][current_x * 2 + 1] == 1:
+                neighbors.append((current_x, current_y + 1, Direction.SOUTH))
+                
+            # Check west neighbor
+            if current_x > 0 and cells[current_y * 2 + 1][(current_x - 1) * 2 + 1] == 1:
+                neighbors.append((current_x - 1, current_y, Direction.WEST))
+                
+            if neighbors:
+                # Choose a random neighbor
+                next_x, next_y, direction = random.choice(neighbors)
+                
+                # Remove the wall between cells
+                if direction == Direction.NORTH:
+                    cells[current_y * 2][current_x * 2 + 1] = 0
+                elif direction == Direction.EAST:
+                    cells[current_y * 2 + 1][current_x * 2 + 2] = 0
+                elif direction == Direction.SOUTH:
+                    cells[current_y * 2 + 2][current_x * 2 + 1] = 0
+                elif direction == Direction.WEST:
+                    cells[current_y * 2 + 1][current_x * 2] = 0
+                    
+                # Mark the neighbor as visited
+                cells[next_y * 2 + 1][next_x * 2 + 1] = 0
+                
+                # Add the neighbor to the stack
+                stack.append((next_x, next_y))
+            else:
+                # Backtrack
+                stack.pop()
+                
+        # Now create the maze rooms based on the generated layout
+        return self._create_maze_rooms(cells)
+        
+    def _create_maze_rooms(self, cells):
+        """
+        Create the maze rooms based on the generated layout.
+        
+        Args:
+            cells: 2D grid representing the maze layout
+            
+        Returns:
+            tuple: (entrance_room, exit_room)
+        """
+        # Create rooms for each cell in the grid
+        for y in range(self.height):
+            for x in range(self.width):
+                # Create a maze room
+                room = create_object(
+                    "typeclasses.maze.MazeRoom",
+                    key=f"Maze Room ({x},{y})",
+                    attributes={
+                        "desc": "A twisting passage in the maze. Colorful objects are scattered around.",
+                        "maze_x": x,
+                        "maze_y": y
+                    }
+                )
+                
+                # Store the room in our grid
+                self.grid[y][x] = room
+                
+                # Connect to adjacent rooms
+                # Check north
+                if y > 0 and self.grid[y-1][x] and cells[y*2][x*2+1] == 0:
+                    self._create_exit(room, self.grid[y-1][x], Direction.NORTH)
+                    
+                # Check west
+                if x > 0 and self.grid[y][x-1] and cells[y*2+1][x*2] == 0:
+                    self._create_exit(room, self.grid[y][x-1], Direction.WEST)
+        
+        # Choose entrance and exit
+        # Entrance is at a random position on the edge
+        edge_rooms = []
+        
+        # North edge
+        edge_rooms.extend([(x, 0) for x in range(self.width)])
+        
+        # East edge
+        edge_rooms.extend([(self.width-1, y) for y in range(1, self.height)])
+        
+        # South edge
+        edge_rooms.extend([(x, self.height-1) for x in range(self.width-2, -1, -1)])
+        
+        # West edge
+        edge_rooms.extend([(0, y) for y in range(self.height-2, 0, -1)])
+        
+        # Choose random points for entrance and exit (on opposite sides if possible)
+        entrance_idx = random.randint(0, len(edge_rooms) - 1)
+        exit_idx = (entrance_idx + len(edge_rooms) // 2) % len(edge_rooms)
+        
+        entrance_x, entrance_y = edge_rooms[entrance_idx]
+        exit_x, exit_y = edge_rooms[exit_idx]
+        
+        entrance_room = self.grid[entrance_y][entrance_x]
+        exit_room = self.grid[exit_y][exit_x]
+        
+        # Mark the entrance and exit
+        entrance_room.db.is_entrance = True
+        entrance_room.db.desc = "The entrance to the maze. Colorful objects are scattered around."
+        
+        exit_room.db.is_exit = True
+        exit_room.db.desc = "The exit from the maze. Colorful objects are scattered around."
+        
+        # Connect the entrance to the outside world if provided
+        if self.entrance_room:
+            # Determine direction from entrance room to maze entrance
+            if entrance_y == 0:
+                direction = Direction.SOUTH
+            elif entrance_x == self.width - 1:
+                direction = Direction.WEST
+            elif entrance_y == self.height - 1:
+                direction = Direction.NORTH
+            else:  # entrance_x == 0
+                direction = Direction.EAST
+                
+            self._create_exit(self.entrance_room, entrance_room, direction)
+            
+        self.entrance = entrance_room
+        self.exit = exit_room
+        
+        return entrance_room, exit_room
+        
+    def _create_exit(self, source, destination, direction):
+        """
+        Create an exit between two rooms.
+        
+        Args:
+            source: Source room
+            destination: Destination room
+            direction (Direction): Direction from source to destination
+        """
+        if direction == Direction.NORTH:
+            source.db.north = destination
+            destination.db.south = source
+        elif direction == Direction.EAST:
+            source.db.east = destination
+            destination.db.west = source
+        elif direction == Direction.SOUTH:
+            source.db.south = destination
+            destination.db.north = source
+        elif direction == Direction.WEST:
+            source.db.west = destination
+            destination.db.east = source</code></pre>
+        </section>
+
+        <section>
+            <h3>The Maze Room Typeclass</h3>
+            <p>
+                Now let's define the MazeRoom typeclass that will represent each cell in our maze:
+            </p>
+            
+            <pre><code># In mygame/typeclasses/maze.py
+from evennia import DefaultRoom
+import random
+from .attributes import roll_ability_check
+
+class MazeRoom(DefaultRoom):
+    """
+    A room in the Boardwalk maze.
+    These rooms are procedurally generated and may contain
+    items needed for radiant quests.
+    """
+    
+    def at_object_creation(self):
+        """Set up maze room attributes."""
+        super().at_object_creation()
+        self.db.area_type = "maze"
+        self.db.maze_x = 0
+        self.db.maze_y = 0
+        self.db.is_entrance = False
+        self.db.is_exit = False
+        self.db.visited = set()  # Track players who've visited
+        
+    def at_object_receive(self, obj, source_location):
+        """Called when an object enters the room."""
+        super().at_object_receive(obj, source_location)
+        
+        # If this is a player character, add to visited set
+        if hasattr(obj, 'is_superuser'):
+            # Add character to the visited list if not there already
+            if obj not in self.db.visited:
+                self.db.visited.add(obj)
+                
+                # First-time visitors might find something
+                if not self.db.is_entrance and not self.db.is_exit:
+                    # Roll a perception check
+                    if hasattr(obj, 'ability_check'):
+                        success, roll, bonus = obj.ability_check('wisdom', 10)
+                        if success:
+                            self._spawn_random_item()
+                            obj.msg("You notice something interesting here!")
+    
+    def return_appearance(self, looker):
+        """Customize appearance for maze rooms."""
+        appearance = super().return_appearance(looker)
+        
+        # Add special descriptions for entrance/exit
+        if self.db.is_entrance:
+            appearance += "\n\n|gThis is the entrance to the maze.|n"
+        elif self.db.is_exit:
+            appearance += "\n\n|gThis is the exit from the maze.|n"
+            
+        # Add hint about directions
+        exits = []
+        for direction in ["north", "east", "south", "west"]:
+            if hasattr(self.db, direction) and self.db.get(direction):
+                exits.append(direction)
+                
+        if exits:
+            exit_list = list_to_string(exits)
+            appearance += f"\n\nPaths lead {exit_list}."
+        else:
+            appearance += "\n\nThere are no obvious exits."
+            
+        return appearance
+        
+    def _spawn_random_item(self):
+        """Spawn a random item in the room."""
+        # 30% chance to spawn an item
+        if random.random() > 0.3:
+            return
+            
+        # Create a random colored object
+        colors = ["red", "blue", "green", "yellow", "purple", "orange"]
+        sizes = ["small", "medium", "large"]
+        shapes = ["ball", "cube", "pyramid", "cylinder", "star"]
+        
+        color = random.choice(colors)
+        size = random.choice(sizes)
+        shape = random.choice(shapes)
+        
+        from evennia import create_object
+        item = create_object(
+            "typeclasses.maze.MazeItem",
+            key=f"{color} {shape}",
+            location=self
+        )
+        
+        item.set_properties(color=color, size=size, shape=shape)
+        
+        return item</code></pre>
+            
+            <div class="tip">
+                <strong>Tip:</strong> The MazeRoom typeclass includes perception checks based on the character's wisdom attribute to detect 
+                hidden items. This integrates our maze system with the character attributes system we built previously.
+            </div>
+        </section>
+
+        <section>
+            <h3>Using Maze Generation in Commands</h3>
+            <p>
+                Now let's implement a command to enter the maze:
+            </p>
+            
+            <pre><code># In mygame/commands/boardwalk_commands.py
+class CmdEnterMaze(Command):
+    """
+    Enter the Boardwalk maze.
+    
+    Usage:
+      entermaze
+      
+    Generates a new random maze for you to explore.
+    The maze contains objects that may be requested by
+    quest-giving NPCs.
+    """
+    
+    key = "entermaze"
+    aliases = ["maze"]
+    help_category = "Boardwalk"
+    
+    def func(self):
+        """Execute the command"""
+        caller = self.caller
+        
+        # Check if we're at the maze entrance
+        if not hasattr(caller.location.db, "is_maze_entrance") or not caller.location.db.is_maze_entrance:
+            caller.msg("You must be at the maze entrance to use this command.")
+            return
+            
+        # Generate a new maze
+        from typeclasses.maze import MazeGenerator
+        
+        # Size based on player level for scalable difficulty
+        level = 1
+        if hasattr(caller, "get_attribute"):
+            level = caller.get_attribute("level") or 1
+            
+        # Higher levels get bigger mazes
+        width = min(3 + level // 2, 8)
+        height = min(3 + level // 2, 8)
+        
+        generator = MazeGenerator(width, height, caller.location)
+        entrance, exit = generator.generate()
+        
+        # Spawn quest items if player has active quests
+        if hasattr(caller.db, "active_quests"):
+            for quest_id, quest in caller.db.active_quests.items():
+                if quest["type"] == "fetch" and "target_properties" in quest:
+                    # Choose a random room for the quest item
+                    rooms = []
+                    for y in range(height):
+                        for x in range(width):
+                            room = generator.grid[y][x]
+                            if room != entrance and room != exit:
+                                rooms.append(room)
+                    
+                    if rooms:
+                        room = random.choice(rooms)
+                        
+                        # Create the quest item
+                        properties = quest["target_properties"]
+                        from evennia import create_object
+                        item = create_object(
+                            "typeclasses.maze.MazeItem",
+                            key=f"{properties.get('color', 'colorful')} {properties.get('shape', 'object')}",
+                            location=room
+                        )
+                        
+                        item.set_properties(**properties)
+                        item.db.is_quest_item = True
+                        item.db.quest_id = quest_id
+        
+        # Move the player to the maze entrance
+        caller.msg("You enter the maze. The walls shift behind you, forming a new layout.")
+        caller.move_to(entrance)
+        
+# Don't forget to add this command to the BoardwalkCmdSet</code></pre>
+        </section>
+
+        <section class="navigation-links">
+            <a href="implementation.html" class="prev-link">← Previous: Implementation</a>
+            <a href="quests.html" class="next-link">Next: Quest System →</a>
+        </section>
+    </main>
+
+    <footer>
+        <p>Pythonic MUD - Educational Game Development Project</p>
+        <p class="copyright">© 2024 Pythonic MUD Team</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Implementation - Radiant Quest System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Source+Code+Pro&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Pythonic MUD</h1>
+            <div class="subtitle">Building a Radiant Quest System</div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="concepts.html">Core Concepts</a></li>
+                <li><a href="implementation.html" class="active">Implementation</a></li>
+                <li><a href="maze.html">Maze Generation</a></li>
+                <li><a href="quests.html">Quest System</a></li>
+                <li><a href="extensions.html">Extensions</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Implementation Overview</h2>
+            <p class="lead">Building the foundation of our radiant quest system</p>
+            <div class="diagram">
+                <img src="images/implementation_diagram.png" alt="Implementation Diagram" onerror="this.src='https://via.placeholder.com/800x400?text=Implementation+Diagram'">
+                <p class="caption">Overview of the radiant quest system implementation</p>
+            </div>
+        </section>
+
+        <section>
+            <h3>Project Structure</h3>
+            <p>
+                We'll organize our code into several modules to maintain a clean architecture:
+            </p>
+            <pre><code># File structure
+mygame/
+├── typeclasses/
+│   ├── boardwalk.py     # Boardwalk area and attraction typeclasses
+│   ├── maze.py          # Maze room and item typeclasses
+│   └── quest_manager.py # Quest generation and tracking system
+├── commands/
+│   ├── boardwalk_commands.py # Commands for the Boardwalk area
+│   └── quest_commands.py     # Commands for interacting with quests
+└── world/
+    ├── boardwalk/             # World building scripts for Boardwalk
+    │   └── batch_cmds.ev      # Batch commands to create the area
+    └── radiant_quests/        # Quest templates and configuration
+        └── quest_templates.py # Quest template definitions</code></pre>
+            
+            <p>
+                This modular approach allows us to:
+            </p>
+            <ul>
+                <li>Separate concerns for maintainability</li>
+                <li>Reuse components in other areas</li>
+                <li>Test modules independently</li>
+                <li>Extend functionality without major refactoring</li>
+            </ul>
+        </section>
+
+        <section>
+            <h3>Step 1: Define Item Properties</h3>
+            <p>
+                First, let's create a property system for our maze items. We'll use a decorator pattern on top of Evennia's typeclass system.
+            </p>
+            <pre><code># In mygame/typeclasses/maze.py
+from enum import Enum
+from evennia import DefaultObject
+
+class ItemColor(Enum):
+    RED = "red"
+    BLUE = "blue"
+    GREEN = "green"
+    YELLOW = "yellow"
+    PURPLE = "purple"
+    ORANGE = "orange"
+
+class ItemSize(Enum):
+    SMALL = "small"
+    MEDIUM = "medium"
+    LARGE = "large"
+
+class ItemShape(Enum):
+    BALL = "ball"
+    CUBE = "cube"
+    PYRAMID = "pyramid"
+    CYLINDER = "cylinder"
+    STAR = "star"
+
+class MazeItem(DefaultObject):
+    """
+    An item that can be found in the Boardwalk maze.
+    Each item has properties like color, size, and shape that are used
+    for radiant quest objectives.
+    """
+    
+    def at_object_creation(self):
+        """Set up default properties."""
+        super().at_object_creation()
+        
+        # Default properties
+        self.db.color = None
+        self.db.size = None
+        self.db.shape = None
+        self.db.is_quest_item = False
+        self.db.quest_id = None
+        
+    def set_properties(self, color=None, size=None, shape=None):
+        """
+        Set the physical properties of this item.
+        
+        Args:
+            color (ItemColor): The color of the item
+            size (ItemSize): The size of the item
+            shape (ItemShape): The shape of the item
+        """
+        if color:
+            self.db.color = color.value if isinstance(color, ItemColor) else color
+        if size:
+            self.db.size = size.value if isinstance(size, ItemSize) else size
+        if shape:
+            self.db.shape = shape.value if isinstance(shape, ItemShape) else shape
+            
+        # Update the description based on properties
+        self._update_description()
+        
+    def _update_description(self):
+        """Update item description based on its properties."""
+        color = self.db.color or "nondescript"
+        size = self.db.size or "medium-sized"
+        shape = self.db.shape or "object"
+        
+        self.db.desc = f"A {color} {size} {shape}."
+        
+    def return_appearance(self, looker):
+        """Customize item appearance to highlight its properties."""
+        appearance = super().return_appearance(looker)
+        
+        # Add highlighted properties for quest items
+        if self.db.is_quest_item:
+            properties = []
+            if self.db.color:
+                properties.append(f"|rColor:|n {self.db.color}")
+            if self.db.size:
+                properties.append(f"|rSize:|n {self.db.size}")
+            if self.db.shape:
+                properties.append(f"|rShape:|n {self.db.shape}")
+                
+            if properties:
+                appearance += "\n\n" + "\n".join(properties)
+                
+        return appearance
+                
+    def matches_properties(self, color=None, size=None, shape=None):
+        """
+        Check if this item matches the specified properties.
+        
+        Args:
+            color (str): Color to match
+            size (str): Size to match
+            shape (str): Shape to match
+            
+        Returns:
+            bool: True if all specified properties match
+        """
+        if color and self.db.color != color:
+            return False
+        if size and self.db.size != size:
+            return False
+        if shape and self.db.shape != shape:
+            return False
+            
+        return True</code></pre>
+
+            <div class="tip">
+                <strong>Tip:</strong> Using enums for property values ensures type safety and prevents typos. However,
+                we also allow string values for flexibility when scripting quest generation.
+            </div>
+        </section>
+
+        <section>
+            <h3>Step 2: Create the Boardwalk Area</h3>
+            <p>
+                Next, we'll set up the Boardwalk area that will serve as the hub for our quests.
+            </p>
+            
+            <pre><code># In mygame/typeclasses/boardwalk.py
+from evennia import DefaultRoom, DefaultObject, DefaultExit
+from evennia.utils.utils import list_to_string
+
+class BoardwalkRoom(DefaultRoom):
+    """Base room type for the Boardwalk area."""
+    
+    def at_object_creation(self):
+        """Set up boardwalk-specific attributes."""
+        super().at_object_creation()
+        self.db.area_type = "boardwalk"
+        
+    def return_appearance(self, looker):
+        """Customize appearance to highlight attractions."""
+        appearance = super().return_appearance(looker)
+        
+        # Add tokens info if player has them
+        if hasattr(looker.db, "tokens"):
+            tokens = looker.db.tokens
+            appearance += f"\n\n|gYou have {tokens} token{'s' if tokens != 1 else ''}.|n"
+            
+        # Highlight attractions
+        attractions = []
+        for obj in self.contents:
+            if hasattr(obj, 'is_attraction') and obj.is_attraction:
+                attractions.append(obj)
+                
+        if attractions:
+            attraction_names = list_to_string([obj.name for obj in attractions])
+            appearance += f"\n\n|yAttractions:|n {attraction_names}"
+            
+        return appearance
+
+class BoardwalkAttraction(DefaultObject):
+    """Base class for Boardwalk games and attractions."""
+    
+    def at_object_creation(self):
+        """Set up attraction attributes."""
+        super().at_object_creation()
+        self.db.token_cost = 1  # Default cost in tokens
+        self.db.description = "A boardwalk attraction."
+        self.db.is_attraction = True
+        
+        # Lock the attraction so it can't be picked up
+        self.locks.add("get:false()")
+        
+    def return_appearance(self, looker):
+        """Customize appearance to show token cost."""
+        appearance = super().return_appearance(looker)
+        token_cost = self.db.token_cost
+        
+        cost_line = f"\nCost: {token_cost} token{'s' if token_cost != 1 else ''}"
+        
+        # Show if player has enough tokens
+        if hasattr(looker.db, "tokens"):
+            has_enough = looker.db.tokens >= token_cost
+            if has_enough:
+                cost_line += " |g(You can afford this)|n"
+            else:
+                cost_line += f" |r(You need {token_cost - looker.db.tokens} more)|n"
+                
+        return appearance + cost_line
+        
+    def at_before_get(self, getter):
+        """Prevent picking up attractions."""
+        getter.msg(f"The {self.name} is fixed in place and cannot be moved.")
+        return False</code></pre>
+
+            <div class="note">
+                <strong>Note:</strong> The Boardwalk area serves as the central hub for our quest system. It's where players will 
+                receive quests, turn them in, and spend tokens on attractions.
+            </div>
+        </section>
+
+        <section>
+            <h3>Step 3: Set Up the Token Economy</h3>
+            <p>
+                We need functions to manage the token economy. Let's add utility functions for tracking tokens.
+            </p>
+            
+            <pre><code># In mygame/typeclasses/quest_manager.py
+def add_tokens(character, amount):
+    """
+    Add tokens to a character's total.
+    
+    Args:
+        character: The character to add tokens to
+        amount (int): Number of tokens to add
+        
+    Returns:
+        int: New token total
+    """
+    if not hasattr(character.db, "tokens"):
+        character.db.tokens = 0
+        
+    character.db.tokens += amount
+    return character.db.tokens
+
+def remove_tokens(character, amount):
+    """
+    Remove tokens from a character's total.
+    
+    Args:
+        character: The character to remove tokens from
+        amount (int): Number of tokens to remove
+        
+    Returns:
+        tuple: (success, new_total)
+    """
+    if not hasattr(character.db, "tokens"):
+        character.db.tokens = 0
+        
+    if character.db.tokens < amount:
+        return False, character.db.tokens
+        
+    character.db.tokens -= amount
+    return True, character.db.tokens
+
+def has_tokens(character, amount):
+    """
+    Check if a character has enough tokens.
+    
+    Args:
+        character: The character to check
+        amount (int): Number of tokens required
+        
+    Returns:
+        bool: True if character has enough tokens
+    """
+    if not hasattr(character.db, "tokens"):
+        character.db.tokens = 0
+        
+    return character.db.tokens >= amount</code></pre>
+
+            <p>
+                These functions will be used when:
+            </p>
+            <ul>
+                <li>Rewarding players for completing quests</li>
+                <li>Charging players for using attractions</li>
+                <li>Displaying token information to players</li>
+            </ul>
+        </section>
+
+        <section>
+            <h3>Implementing the commands</h3>
+            <p>
+                We'll need several commands to interact with our Boardwalk and quest system:
+            </p>
+            
+            <pre><code># In mygame/commands/boardwalk_commands.py
+from evennia.commands.command import Command
+from evennia import CmdSet
+from typeclasses.quest_manager import has_tokens, remove_tokens
+
+class CmdPlay(Command):
+    """
+    Play a boardwalk attraction.
+    
+    Usage:
+      play <attraction>
+      
+    Play a game or ride an attraction on the boardwalk.
+    Each attraction costs a certain number of tokens.
+    """
+    
+    key = "play"
+    aliases = ["use", "ride"]
+    help_category = "Boardwalk"
+    
+    def func(self):
+        """Execute the command"""
+        caller = self.caller
+        
+        if not self.args:
+            caller.msg("What do you want to play?")
+            return
+            
+        # Look for the attraction
+        attraction = caller.search(self.args)
+        if not attraction:
+            return
+            
+        # Check if it's an attraction
+        if not hasattr(attraction, 'db') or not attraction.db.is_attraction:
+            caller.msg(f"{attraction.name} is not a boardwalk attraction.")
+            return
+            
+        # Check if the player has enough tokens
+        token_cost = attraction.db.token_cost
+        if not has_tokens(caller, token_cost):
+            caller.msg(f"You need {token_cost} tokens to play {attraction.name}.")
+            return
+            
+        # Remove tokens and activate the attraction
+        success, new_total = remove_tokens(caller, token_cost)
+        if success:
+            # This would call a method on the attraction to run its game logic
+            # For simplicity, we'll just show a message here
+            caller.msg(f"You spend {token_cost} tokens to play {attraction.name}.")
+            caller.msg(f"You now have {new_total} tokens left.")
+            
+            # The attraction would have its own logic for what happens when played
+            if hasattr(attraction, "at_play"):
+                attraction.at_play(caller)
+            else:
+                caller.msg("You have fun playing the attraction!")
+                
+            # Announce to the room
+            caller.location.msg_contents(
+                f"{caller.name} plays {attraction.name}.",
+                exclude=caller
+            )
+        else:
+            # This shouldn't happen if we checked tokens first
+            caller.msg("Something went wrong. You couldn't play the attraction.")
+
+class CmdTokens(Command):
+    """
+    Check your boardwalk token balance.
+    
+    Usage:
+      tokens
+      
+    Shows how many boardwalk tokens you currently have.
+    """
+    
+    key = "tokens"
+    help_category = "Boardwalk"
+    
+    def func(self):
+        """Execute the command"""
+        caller = self.caller
+        
+        if not hasattr(caller.db, "tokens"):
+            caller.db.tokens = 0
+            
+        tokens = caller.db.tokens
+        caller.msg(f"You have {tokens} token{'s' if tokens != 1 else ''}.")
+
+class BoardwalkCmdSet(CmdSet):
+    """
+    Cmdset for boardwalk-related commands.
+    """
+    
+    key = "boardwalk_commands"
+    
+    def at_cmdset_creation(self):
+        """
+        Add boardwalk commands to the command set
+        """
+        self.add(CmdPlay())
+        self.add(CmdTokens())</code></pre>
+        </section>
+
+        <section class="navigation-links">
+            <a href="concepts.html" class="prev-link">← Previous: Core Concepts</a>
+            <a href="maze.html" class="next-link">Next: Maze Generation →</a>
+        </section>
+    </main>
+
+    <footer>
+        <p>Pythonic MUD - Educational Game Development Project</p>
+        <p class="copyright">© 2024 Pythonic MUD Team</p>
+    </footer>
+</body>
+</html>
