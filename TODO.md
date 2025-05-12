@@ -19,7 +19,20 @@
 - [x] Add tutorial area for new players
 - [x] Add character attributes and RPG mechanics (strength, dexterity, wisdom, health, mana, level, experience)
 
-## Sprint 2: Character Progression & Equipment 🔄
+## Sprint 2: Randomized Quest System & Boardwalk 🔄
+- [ ] Boardwalk Mini-Game Area
+  - [ ] Create the Boardwalk hub area with NPCs and attractions
+  - [ ] Design Maze mini-game with randomized layouts
+  - [ ] Implement token economy for playing games and winning prizes
+  - [ ] Add different difficulty levels with increasing rewards
+- [ ] Radiant Quest System
+  - [ ] Create quest generator with randomized objectives
+  - [ ] Implement fetch quests with varied item descriptions
+  - [ ] Add daily/repeatable quest mechanics
+  - [ ] Design quest reward scaling based on difficulty
+  - [ ] Create quest tracking and progress indicators
+
+## Sprint 3: Character Progression & Equipment 🔄
 - [ ] Equipment System
   - [ ] Create equippable items with slots (weapon, armor, etc.)
   - [ ] Implement inventory management with constraints
